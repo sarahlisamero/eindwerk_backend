@@ -18,6 +18,9 @@ db.once("open", function () {
   console.log("Connected to MongoDB");
 });
 
+const parentsRouter = require('./routes/api/v1/parents');
+app.use('/api/v1/parents', parentsRouter);
+
 const server = http.createServer(app);
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
