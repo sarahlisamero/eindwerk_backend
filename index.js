@@ -20,6 +20,8 @@ db.once("open", function () {
 
 const parentsRouter = require('./routes/api/v1/parents');
 app.use('/api/v1/parents', parentsRouter);
+const childrenRouter = require('./routes/api/v1/children');
+app.use('/api/v1/children', childrenRouter);
 
 const server = http.createServer(app);
 server.listen(port, () => {
