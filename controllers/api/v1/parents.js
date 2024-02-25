@@ -1,9 +1,9 @@
 const Parent = require('../../../models/Parent');
-//const Child = require('../../../models/Child');
+const Child = require('../../../models/Child');
 
 const getAllParents = async (req, res) => {
     try {
-        const parents = await Parent.find()/*.populate('children')*/;
+        const parents = await Parent.find().populate('children');
         res.json(parents);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -12,7 +12,7 @@ const getAllParents = async (req, res) => {
 
 const getParentById = async (req, res) => {
     try {
-        const parent = await Parent.findById(req.params.id)/*.populate('children')*/;
+        const parent = await Parent.findById(req.params.id).populate('children');
         if(parent){
             res.json(parent);
         }
