@@ -9,14 +9,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-/*mongoose.connect(process.env.MONGODB);
+mongoose.connect(process.env.MONGODB);
 console.log(process.env.MONGODB);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
   console.log("Connected to MongoDB");
-});*/
+});
 
 const server = http.createServer(app);
 server.listen(port, () => {
