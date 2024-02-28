@@ -34,6 +34,11 @@ const taskSchema = new Schema({
         type: Boolean,
         required: true,
     },
+    child: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Child',
+        required: true
+    },
 });
 
 const Task = mongoose.model('Task', taskSchema);

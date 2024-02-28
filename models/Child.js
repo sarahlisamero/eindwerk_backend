@@ -14,6 +14,10 @@ const childSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Parent' 
     }], //many to many relationship
+    tasks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task'
+    }],
 });
 
 const Child = mongoose.model('Child', childSchema);
