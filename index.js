@@ -22,6 +22,8 @@ const parentsRouter = require('./routes/api/v1/parents');
 app.use('/api/v1/parents', parentsRouter);
 const childrenRouter = require('./routes/api/v1/children');
 app.use('/api/v1/children', childrenRouter);
+const tasksRouter = require('./routes/api/v1/tasks');
+app.use('/api/v1/tasks', tasksRouter);
 
 const server = http.createServer(app);
 server.listen(port, () => {

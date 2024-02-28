@@ -1,5 +1,6 @@
 const Child = require('../../../models/Child');
 const Parent = require('../../../models/Parent');
+const Task = require('../../../models/Task');
 
 const getAllChildren = async (req, res) => {
     try {
