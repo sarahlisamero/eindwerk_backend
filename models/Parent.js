@@ -1,25 +1,32 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const passportLocalMongoose = require('passport-local-mongoose');
 
-const parentSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true, //no double usernames
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    admin: {
-        type: Boolean,
-        default: true,
-    },
-    children: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Child' 
-    }] //many to many relationship
-});
+const Parent = new Schema({});
 
-const Parent = mongoose.model('Parent', parentSchema);
-module.exports = Parent;
+Parent.plugin(passportLocalMongoose);
+
+
+// const parentSchema = new Schema({
+//     username: {
+//         type: String,
+//         required: true,
+//         unique: true, //no double usernames
+//     },
+//     password: {
+//         type: String,
+//         required: true,
+//     },
+//     admin: {
+//         type: Boolean,
+//         default: true,
+//     },
+//     children: [{ 
+//         type: mongoose.Schema.Types.ObjectId, 
+//         ref: 'Child' 
+//     }] //many to many relationship
+// });
+
+// const Parent = mongoose.model('Parent', parentSchema);
+// module.exports = Parent;
+module.exports = mongoose.model ('Parent', Parent)
