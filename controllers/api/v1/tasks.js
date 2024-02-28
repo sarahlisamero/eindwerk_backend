@@ -35,5 +35,15 @@ const getTaskById = async (req, res) => {
     }
 };
 
+const getTasksByChildId = async (req, res) => {
+    try {
+        const tasks = await Task.find({ child: req.params.childId });
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
+module.exports.getTasksByChildId = getTasksByChildId;
