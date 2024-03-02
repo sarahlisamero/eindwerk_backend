@@ -3,6 +3,7 @@ const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require ('dotenv').config();
+const passport = require('./passport/passport');
 const port = 3000;
 
 const app = express();
@@ -21,9 +22,9 @@ db.once("open", function () {
 const parentsRouter = require('./routes/api/v1/parents');
 app.use('/api/v1/parents', parentsRouter);
 const childrenRouter = require('./routes/api/v1/children');
-app.use('/api/v1/children', childrenRouter);
+app.use('/api/v1/children', passport.authenticate('jwt', {session: false}), childrenRouter);
 const tasksRouter = require('./routes/api/v1/tasks');
-app.use('/api/v1/tasks', tasksRouter);
+app.use('/api/v1/tasks', passport.authenticate('jwt', {session: false}), tasksRouter);
 
 const server = http.createServer(app);
 server.listen(port, () => {

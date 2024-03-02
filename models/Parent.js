@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const passportLocalMongoose = require('passport-local-mongoose');
 
-const parentSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true, //no double usernames
-    },
-    password: {
-        type: String,
-        required: true,
-    },
+const Parent = new Schema({
     admin: {
         type: Boolean,
         default: true,
@@ -21,5 +13,6 @@ const parentSchema = new Schema({
     }] //many to many relationship
 });
 
-const Parent = mongoose.model('Parent', parentSchema);
-module.exports = Parent;
+Parent.plugin(passportLocalMongoose);
+
+module.exports = mongoose.model ('Parent', Parent)
