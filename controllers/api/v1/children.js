@@ -1,6 +1,7 @@
 const Child = require('../../../models/Child');
 const Parent = require('../../../models/Parent');
 const Task = require('../../../models/Task');
+const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
 
 const getAllChildren = async (req, res) => {
     try {
@@ -24,6 +25,10 @@ const getChildById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+exports.uploadChildProfilePicture = async (req, res) => {
+    await handleProfilePictureUpload(Child, req, res);
+};
 
 const createChild = async (req, res) => {
     const { name, code, parents: parentIds } = req.body; 

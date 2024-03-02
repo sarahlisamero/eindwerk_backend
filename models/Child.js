@@ -18,6 +18,9 @@ const childSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task'
     }],
+    profilePicture: {
+        type: String,
+    }
 });
 
 const Child = mongoose.model('Child', childSchema);
