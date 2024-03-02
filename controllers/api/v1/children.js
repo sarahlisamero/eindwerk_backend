@@ -52,7 +52,26 @@ const createChild = async (req, res) => {
     }
 };
 
+const deleteChild = async (req, res) => {
+    try {
+        const childId = req.params.id;
+        const child = await Child.findById(childId);
+        if(!child){
+            return res.status(404).json({ message: 'Child not found' });
+        }
+        await Parent.updateMany(
+            { _id: { $in: child.parents } }, 
+            { $pull: { children: childId } 
+        });
+        await Child.findByIdAndDelete(childId);
+        res.json({ message: 'Child deleted successfully' });
+    }
+    catch(error){
+        res.status(500).json({ message: error.message });
+    }
+};
 
 module.exports.getAllChildren = getAllChildren;
 module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
+module.exports.deleteChild = deleteChild;
