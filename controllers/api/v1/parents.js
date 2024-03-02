@@ -1,6 +1,7 @@
 const Parent = require('../../../models/Parent');
 const Child = require('../../../models/Child');
 const Task = require('../../../models/Task');
+const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
 
 const getAllParents = async (req, res) => {
     try {
@@ -26,29 +27,16 @@ const getParentById = async (req, res) => {
 }
 
 exports.uploadParentProfilePicture = async (req, res) => {
-    try{
-        const parent = await Parent.findById(req.params.id);
-        if(parent){
-            parent.profilePicture = req.file.path;
-            await parent.save();
-            //res.json(parent);
-            res.send("Profile picture uploaded successfully")
-        }
-        else{
-            res.status(404).json({ message: 'Parent not found' });
-        }
-    } catch (error) {
-        console.error("Error uploading profile picture: ", error.message)
-        res.status(500).json({ message: error.message });
-    }
+    await handleProfilePictureUpload(Parent, req, res);
 };
+
 
 const createParent = async (req, res) => {
     const parent = new Parent({
         username: req.body.username,
         password: req.body.password,
         admin: req.body.admin,
-        children: req.body.children
+        children: req.body.children,
     });
     try {
         const newParent = await parent.save();
