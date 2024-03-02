@@ -26,6 +26,11 @@ app.use('/api/v1/children', passport.authenticate('jwt', {session: false}), chil
 const tasksRouter = require('./routes/api/v1/tasks');
 app.use('/api/v1/tasks', passport.authenticate('jwt', {session: false}), tasksRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 const server = http.createServer(app);
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
