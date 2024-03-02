@@ -25,6 +25,24 @@ const getParentById = async (req, res) => {
     }
 }
 
+exports.uploadParentProfilePicture = async (req, res) => {
+    try{
+        const parent = await Parent.findById(req.params.id);
+        if(parent){
+            parent.profilePicture = req.file.path;
+            await parent.save();
+            //res.json(parent);
+            res.send("Profile picture uploaded successfully")
+        }
+        else{
+            res.status(404).json({ message: 'Parent not found' });
+        }
+    } catch (error) {
+        console.error("Error uploading profile picture: ", error.message)
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const createParent = async (req, res) => {
     const parent = new Parent({
         username: req.body.username,

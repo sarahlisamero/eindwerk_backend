@@ -10,7 +10,10 @@ const Parent = new Schema({
     children: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Child' 
-    }] //many to many relationship
+    }], //many to many relationship
+    profilePicture: {
+        type: String,
+    },
 });
 
 Parent.plugin(passportLocalMongoose);
