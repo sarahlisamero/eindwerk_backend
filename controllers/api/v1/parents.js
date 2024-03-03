@@ -46,6 +46,21 @@ const createParent = async (req, res) => {
     }
 }
 
+const deleteParent = async (req, res) => {
+    try {
+        const parent = await Parent.findById(req.params.id);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found' });
+        }
+
+        await Parent.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Parent deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports.getAllParents = getAllParents;
 module.exports.getParentById = getParentById;
 module.exports.createParent = createParent;
+module.exports.deleteParent = deleteParent;

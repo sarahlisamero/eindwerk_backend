@@ -11,5 +11,6 @@ router.post('/', parentsController.createParent);
 router.post('/:id/profilePicture', upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.delete('/:id', parentsController.deleteParent);
 
 module.exports = router;
