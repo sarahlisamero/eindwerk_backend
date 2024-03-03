@@ -52,6 +52,11 @@ const deleteParent = async (req, res) => {
         if (!parent) {
             return res.status(404).json({ message: 'Parent not found' });
         }
+        const children = await Child.find({ parents: parent._id });
+
+        await Child.deleteMany({ parents: parent._id });
+
+        await Task.deleteMany({ _id: { $in: children.map(child => child.tasks).flat() } });
 
         await Parent.findByIdAndDelete(req.params.id);
         res.json({ message: 'Parent deleted successfully' });
