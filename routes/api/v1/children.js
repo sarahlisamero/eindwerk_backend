@@ -13,5 +13,7 @@ router.post('/', childrenController.createChild);
 router.post('/:id/profilePicture', upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
 //delete
 router.delete('/:id', childrenController.deleteChild);
+//put
+router.put('/:id/username', childrenController.updateChildUsername);
 
 module.exports = router;
