@@ -65,7 +65,27 @@ const deleteParent = async (req, res) => {
     }
 }
 
+const updateParentUsername = async (req, res) => {
+    const { id } = req.params; // Parent ID
+    const { username } = req.body; // New username
+
+    try {
+        const parent = await Parent.findById(id);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found' });
+        }
+
+        parent.username = username;
+        const updatedParent = await parent.save();
+
+        res.json(updatedParent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports.getAllParents = getAllParents;
 module.exports.getParentById = getParentById;
 module.exports.createParent = createParent;
 module.exports.deleteParent = deleteParent;
+module.exports.updateParentUsername = updateParentUsername;
