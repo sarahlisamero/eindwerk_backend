@@ -13,6 +13,7 @@ router.post('/', parentsController.createParent);
 router.post('/:id/profilePicture', upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.post('/change-password', authController.changePassword);
 //delete
 router.delete('/:id', parentsController.deleteParent);
 //put
