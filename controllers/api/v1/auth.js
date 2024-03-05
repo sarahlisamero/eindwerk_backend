@@ -63,5 +63,62 @@ const login = async (req, res, next) => {
     });
 };
 
+// changePassword
+const changePassword = async (req, res) => {
+    const user = await Parent.authenticate()(req.body.username, req.body.oldPassword).then(result => {
+        // console.log(req.body.username);
+        // console.log(req.body.oldPassword);
+        // console.log(req.body.newPassword);
+
+        let username = req.body.username;
+        let oldPassword = req.body.oldPassword;
+        let newPassword = req.body.newPassword;
+
+        // check if user exists
+        if (!username || !oldPassword || !newPassword) {
+            return res.json({
+                "status": "error",
+                "message": "Please fill in all fields"
+            })
+        }
+
+        
+        if (!result.user) {
+            return res.json({
+                "status": "error",
+                "message": "User not found"
+            })
+        }
+
+        
+        // user found
+        result.user.setPassword(req.body.newPassword, async (err, user) => {
+            if (err) {
+                return res.json({
+                    "status": "error",
+                    "message": "Error changing password"
+                })
+            }
+            await user.save().then(result => {
+                res.json({
+                    "status": "success",
+                    "message": "Password changed"
+                })
+            }).catch(error => {
+                res.json({
+                    "status": "error",
+                    "message": "Error changing password"
+                })
+            });
+        });
+    }).catch(error => {
+        res.json({
+            "status": "error",
+            "message": "Invalid username or password"
+        })
+    });
+}
+
 module.exports.signup = signup;
 module.exports.login = login;
+module.exports.changePassword = changePassword;
