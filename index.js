@@ -22,9 +22,9 @@ db.once("open", function () {
 const parentsRouter = require('./routes/api/v1/parents');
 app.use('/api/v1/parents', parentsRouter);
 const childrenRouter = require('./routes/api/v1/children');
-//app.use('/api/v1/children', passport.authenticate('jwt', {session: false}), childrenRouter);
+app.use('/api/v1/children', /*passport.authenticate('jwt', {session: false}),*/ childrenRouter);
 const tasksRouter = require('./routes/api/v1/tasks');
-//app.use('/api/v1/tasks', passport.authenticate('jwt', {session: false}), tasksRouter);
+app.use('/api/v1/tasks', /*passport.authenticate('jwt', {session: false}),*/ tasksRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

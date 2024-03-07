@@ -20,6 +20,9 @@ const childSchema = new Schema({
     }],
     profilePicture: {
         type: String,
+    },
+    document: {
+        type: String,
     }
 });
 
