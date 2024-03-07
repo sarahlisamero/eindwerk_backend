@@ -1,7 +1,8 @@
 const Parent = require('../../../models/Parent');
 const Child = require('../../../models/Child');
 const Task = require('../../../models/Task');
-const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
+//const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
+const uploadController = require('./upload');
 const bcrypt = require('bcrypt');
 
 const signup = async (req, res) => {
@@ -69,7 +70,7 @@ const getParentById = async (req, res) => {
 }
 
 exports.uploadParentProfilePicture = async (req, res) => {
-    await handleProfilePictureUpload(Parent, req, res);
+    await uploadController.handleFileUpload(Parent, req, res);
 };
 
 
