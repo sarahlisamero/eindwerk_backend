@@ -1,16 +1,16 @@
-const handleProfilePictureUpload = async (model, req, res) => {
+const handleFileUpload = async (model, req, res) => {
     try {
-        const document = await model.findById(req.params.id);
-        if (!document) {
+        const instance = await model.findById(req.params.id);
+        if (!instance) {
             return res.status(404).send(`${model.modelName} not found`);
         }
-        document.profilePicture = req.file.path;
-        await document.save();
-        res.send(`Profile picture uploaded for ${model.modelName.toLowerCase()} successfully`);
+        instance[req.file.fieldname] = req.file.path;
+        await instance.save();
+        res.send(`${req.file.fieldname} uploaded for ${model.modelName.toLowerCase()} successfully`);
     } catch (error) {
-        console.error(`Error uploading ${model.modelName.toLowerCase()} profile picture:`, error);
+        console.error(`Error uploading ${req.file.fieldname} for ${model.modelName.toLowerCase()}:`, error);
         res.status(500).send('Internal server error');
     }
 };
 
-module.exports = { handleProfilePictureUpload };
+module.exports = { handleFileUpload };

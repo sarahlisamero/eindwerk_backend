@@ -2,7 +2,13 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+        if (file.fieldname === 'profilePicture') {
+            cb(null, 'uploads/profilePictures/');
+        } else if (file.fieldname === 'document') {
+            cb(null, 'uploads/documents/');
+        } else {
+            cb(new Error('Invalid fieldname'));
+        }
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -13,3 +19,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 module.exports = upload;
+
+
+
