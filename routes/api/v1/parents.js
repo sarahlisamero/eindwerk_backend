@@ -7,6 +7,8 @@ const authController = require('../../../controllers/api/v1/auth');
 
 //signup
 router.post('/signup', parentsController.signup);
+//login
+router.post('/login', parentsController.login);
 //get
 router.get('/', parentsController.getAllParents);
 router.get('/:id', parentsController.getParentById);

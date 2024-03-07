@@ -24,6 +24,27 @@ const signup = async (req, res) => {
     }
 };
 
+const login = async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const parent = await Parent.findOne({ username });
+
+        if (!parent) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, parent.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        res.json({ message: 'Login successful' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const getAllParents = async (req, res) => {
     try {
         const parents = await Parent.find().populate('children');
@@ -111,3 +132,4 @@ module.exports.createParent = createParent;
 module.exports.deleteParent = deleteParent;
 module.exports.updateParentUsername = updateParentUsername;
 module.exports.signup = signup;
+module.exports.login = login;
