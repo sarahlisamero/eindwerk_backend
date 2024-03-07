@@ -2,6 +2,27 @@ const Parent = require('../../../models/Parent');
 const Child = require('../../../models/Child');
 const Task = require('../../../models/Task');
 const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
+const bcrypt = require('bcrypt');
+
+const signup = async (req, res) => {
+    const { username, password, admin } = req.body;
+
+    try {
+        const existingParent = await Parent.findOne({ username });
+        if (existingParent) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10); 
+
+        const parent = new Parent({ username, password: hashedPassword, admin });
+        const newParent = await parent.save();
+
+        res.status(201).json(newParent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 const getAllParents = async (req, res) => {
     try {
@@ -89,3 +110,4 @@ module.exports.getParentById = getParentById;
 module.exports.createParent = createParent;
 module.exports.deleteParent = deleteParent;
 module.exports.updateParentUsername = updateParentUsername;
+module.exports.signup = signup;

@@ -1,4 +1,4 @@
-const Parent = require('../../../models/Parent');
+/*const Parent = require('../../../models/Parent');
 const jwt = require('jsonwebtoken'); 
 //const config = require('config');
 const { use } = require('passport');
@@ -64,4 +64,4 @@ const login = async (req, res, next) => {
 };
 
 module.exports.signup = signup;
-module.exports.login = login;
+module.exports.login = login;*/
