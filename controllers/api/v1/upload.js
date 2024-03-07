@@ -4,7 +4,12 @@ const handleFileUpload = async (model, req, res) => {
         if (!instance) {
             return res.status(404).send(`${model.modelName} not found`);
         }
-        instance[req.file.fieldname] = req.file.path;
+        if(req.file.fieldname === 'document'){
+            instance.document.push(req.file.path);
+        }
+        else{
+            instance[req.file.fieldname] = req.file.path;
+        }
         await instance.save();
         res.send(`${req.file.fieldname} uploaded for ${model.modelName.toLowerCase()} successfully`);
     } catch (error) {

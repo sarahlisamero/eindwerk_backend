@@ -21,9 +21,9 @@ const childSchema = new Schema({
     profilePicture: {
         type: String,
     },
-    document: {
+    document: [{
         type: String,
-    }
+    }]
 });
 
 const Child = mongoose.model('Child', childSchema);
