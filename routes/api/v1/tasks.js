@@ -6,6 +6,7 @@ const upload = require('../../../middlewares/upload');
 
 router.post('/', tasksController.createTask);
 router.post('/:id/taskPicture', upload.single('taskPicture'), tasksController.uploadTaskPicture);
+router.post('/:id/audio', upload.single('audio'), tasksController.uploadAudio);
 router.get('/:id', tasksController.getTaskById);
 router.get('/children/:childId', tasksController.getTasksByChildId);
 

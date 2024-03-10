@@ -28,6 +28,10 @@ exports.uploadTaskPicture = async (req, res) => {
     await uploadController.handleFileUpload(Task, req, res);
 };
 
+exports.uploadAudio = async (req, res) => {
+    await uploadController.handleFileUpload(Task, req, res);
+};
+
 const getTaskById = async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);

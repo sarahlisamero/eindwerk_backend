@@ -8,7 +8,10 @@ const storage = multer.diskStorage({
             cb(null, 'uploads/documents/');
         } else if (file.fieldname === 'taskPicture') {
             cb(null, 'uploads/taskPictures/');
-        } else {
+        } else if (file.fieldname === 'audio'){
+            cb(null, 'uploads/audios/');
+        }
+         else {
             cb(new Error('Invalid fieldname'));
         }
     },

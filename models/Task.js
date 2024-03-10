@@ -42,6 +42,9 @@ const taskSchema = new Schema({
     taskPicture: {
         type: String,
     },
+    audio: {
+        type: String,
+    }
 });
 
 const Task = mongoose.model('Task', taskSchema);
