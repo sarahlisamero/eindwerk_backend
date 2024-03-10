@@ -75,41 +75,31 @@ function generateCode(){
     });
 }
 
-// isChildExisting function
-const isChildExisting = async (req, res) => {
-    const { name, code, parents: parentIds } = req.body; 
-
+const checkChildCredentials = async (req, res) => {
+    const { name, code} = req.body;
+    console.log('Received credentials:', name, code);
+    const parentId = req.params.parentId;
     try {
-        // Check if a child with the given name and code exists
-        const existingChild = await Child.findOne({ name, code });
-
-        if (existingChild) {
-            // If child with the given name and code already exists, link it to the parent(s)
-            // Clear the existing parent references
-            existingChild.parents = [];
-
-            // Find parents 
-            const parents = await Parent.find({ _id: { $in: parentIds } });
-
-            // Link child to parent and parent to child
-            const promises = parents.map(async parent => {
-                parent.children.push(existingChild._id);
-                existingChild.parents.push(parent._id);
-                await parent.save(); // Save the parent
-            });
-
-            await Promise.all(promises);
-
-            // Save the child after all parent links have been established
-            await existingChild.save();
-
-            res.status(201).json(existingChild);
-        } else {
-            // If child with the given name and code does not exist, return an error response
-            res.status(400).json({ message: "Child with the provided name and code does not exist." });
+        //find child and check credentials
+        const child = await Child.findOne({ name: name, code: code }).populate('parents');
+        if (!child) {
+            return res.status(404).json({ message: 'Invalid credentials.' });
+        } 
+        //find parent
+        const parent = await Parent.findById(parentId);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found.' });
         }
+        //link parent and child
+        parent.children.push(child._id);
+        await parent.save();
+
+        child.parents.push(parent._id);
+        await child.save();
+
+        res.json({ message: 'Credentials matched and child and parent are linked.' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -156,4 +146,4 @@ module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
 module.exports.deleteChild = deleteChild;
 module.exports.updateChildUsername = updateChildUsername;
-module.exports.isChildExisting = isChildExisting;
+module.exports.checkChildCredentials = checkChildCredentials;
