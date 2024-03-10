@@ -6,6 +6,8 @@ const storage = multer.diskStorage({
             cb(null, 'uploads/profilePictures/');
         } else if (file.fieldname === 'document') {
             cb(null, 'uploads/documents/');
+        } else if (file.fieldname === 'taskPicture') {
+            cb(null, 'uploads/taskPictures/');
         } else {
             cb(new Error('Invalid fieldname'));
         }

@@ -32,12 +32,15 @@ const taskSchema = new Schema({
     },
     allDays: {
         type: Boolean,
-        required: true,
+        /*required: true,*/
     },
     child: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Child',
         required: true
+    },
+    taskPicture: {
+        type: String,
     },
 });
 

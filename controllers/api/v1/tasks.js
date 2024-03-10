@@ -1,6 +1,7 @@
 const Child = require('../../../models/Child');
 const Parent = require('../../../models/Parent');
 const Task = require('../../../models/Task');
+const uploadController = require('./upload');
 
 const createTask = async (req, res) => {
     const task = new Task({
@@ -21,6 +22,10 @@ const createTask = async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
+};
+
+exports.uploadTaskPicture = async (req, res) => {
+    await uploadController.handleFileUpload(Task, req, res);
 };
 
 const getTaskById = async (req, res) => {
