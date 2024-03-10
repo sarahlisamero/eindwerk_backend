@@ -34,49 +34,49 @@ exports.uploadChildDocument = async (req, res) => {
     await uploadController.handleFileUpload(Child, req, res);
 };
 
-// code die er eerst stond
 
-// const createChild = async (req, res) => {
-//     const { name, /*code,*/ parents: parentIds } = req.body; 
-
-//     try{
-//         //generate a unique code for the child
-//         const code = await generateCode();
-//         //find parents 
-//         const parents = await Parent.find({ _id: { $in: parentIds } });
-//         //create child object
-//         const child = new Child({
-//             name,
-//             code,
-//             parents: parents.map(parent => parent._id)
-//         });
-//         //save child
-//         const newChild = await child.save();
-//         //update parents with new child
-//         parents.forEach(async parent => {
-//             parent.children.push(newChild._id);
-//             await parent.save();
-//         });
-//         res.status(201).json(newChild);
-//     }
-//     catch(error){
-//         res.status(400).json({ message: error.message });
-//     }
-// };
-
-// function generateCode(){
-//     const randomString = Math.random().toString(36).substring(2, 8);
-//     return Child.exists({ code: randomString }).then(exists => {
-//         if(exists){
-//             return generateCode();
-//         }
-//         return randomString;
-//     });
-// }
-
-//werkt kan alleen geen nieuwe kinderen aanmaken
-
+// createChild function
 const createChild = async (req, res) => {
+    const { name, parents: parentIds } = req.body; 
+
+    try{
+        // generate a unique code for the child
+        const code = await generateCode();
+        // find parents 
+        const parents = await Parent.find({ _id: { $in: parentIds } });
+        // create child object
+        const child = new Child({
+            name,
+            code,
+            parents: parents.map(parent => parent._id)
+        });
+        // save child
+        const newChild = await child.save();
+        // update parents with new child
+        parents.forEach(async parent => {
+            parent.children.push(newChild._id);
+            await parent.save();
+        });
+        res.status(201).json(newChild);
+    }
+    catch(error){
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// generateCode function
+function generateCode(){
+    const randomString = Math.random().toString(36).substring(2, 8);
+    return Child.exists({ code: randomString }).then(exists => {
+        if(exists){
+            return generateCode();
+        }
+        return randomString;
+    });
+}
+
+// isChildExisting function
+const isChildExisting = async (req, res) => {
     const { name, code, parents: parentIds } = req.body; 
 
     try {
@@ -112,7 +112,6 @@ const createChild = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
-
 
 const deleteChild = async (req, res) => {
     try {
@@ -157,3 +156,4 @@ module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
 module.exports.deleteChild = deleteChild;
 module.exports.updateChildUsername = updateChildUsername;
+module.exports.isChildExisting = isChildExisting;
