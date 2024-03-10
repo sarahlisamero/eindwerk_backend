@@ -4,12 +4,13 @@ const router = express.Router();
 const childrenController = require('../../../controllers/api/v1/children');
 const upload = require('../../../middlewares/upload');
 /*const passport = require('../../../passport/passport');*/
+const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyToken middleware
 
 //get
 router.get('/', /*passport.authenticate('jwt', {session: false}),*/ childrenController.getAllChildren);
 router.get('/:id', childrenController.getChildById);
 //post
-router.post('/', childrenController.createChild);
+router.post('/',authorizeAdmin, childrenController.createChild);
 router.post('/existing', childrenController.isChildExisting); // New route for checking and linking child
 router.post('/:id/profilePicture', upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
 router.post('/:id/document', upload.single('document'), childrenController.uploadChildDocument);

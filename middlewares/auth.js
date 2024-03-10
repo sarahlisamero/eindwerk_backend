@@ -2,24 +2,41 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
+console.log('JWT Secret Key:', secretKey);
 
-const generateToken = (parentId, admin) => {
-    if (!secretKey) {
-        throw new Error('JWT_SECRET is not defined in the environment variables.');
-    }
 
-    return jwt.sign({ parentId, admin }, secretKey, { expiresIn: '1h' });
-};
+    const authorizeAdmin = (req, res, next) => {
+        const token = req.headers.authorization;
+      
+        if (!token) {
+          return res.status(401).json({
+            status: "error",
+            message: "No token provided",
+          });
+        }
+      
+        // No bearer in token
+        const extractToken = token.replace("Bearer ", "");
+      
+        jwt.verify(extractToken, secretKey, (err, decoded) => {
+          if (err) {
+            return res.status(401).json({
+              status: "error",
+              message: "Invalid token",
+            });
+          }
+      
+          if (!decoded.admin) {
+            return res.status(403).json({
+              status: "error",
+              message: "Forbidden: User is not an admin",
+            });
+          }
+      
+          req.user = decoded; // Attach user details to the request object
+      
+          next();
+        });
+      };
 
-const verifyToken = (token) => {
-    try {
-        return jwt.verify(token, secretKey);
-    } catch (error) {
-        throw new Error('Invalid token');
-    }
-};
-
-module.exports = {
-    generateToken,
-    verifyToken
-};
+module.exports = authorizeAdmin;

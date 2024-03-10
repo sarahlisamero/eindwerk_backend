@@ -37,30 +37,34 @@ exports.uploadChildDocument = async (req, res) => {
 
 // createChild function
 const createChild = async (req, res) => {
-    const { name, parents: parentIds } = req.body; 
+    if (req.user.admin){
+        const { name, parents: parentIds } = req.body; 
 
-    try{
-        // generate a unique code for the child
-        const code = await generateCode();
-        // find parents 
-        const parents = await Parent.find({ _id: { $in: parentIds } });
-        // create child object
-        const child = new Child({
-            name,
-            code,
-            parents: parents.map(parent => parent._id)
-        });
-        // save child
-        const newChild = await child.save();
-        // update parents with new child
-        parents.forEach(async parent => {
-            parent.children.push(newChild._id);
-            await parent.save();
-        });
-        res.status(201).json(newChild);
-    }
-    catch(error){
-        res.status(400).json({ message: error.message });
+        try{
+            // generate a unique code for the child
+            const code = await generateCode();
+            // find parents 
+            const parents = await Parent.find({ _id: { $in: parentIds } });
+            // create child object
+            const child = new Child({
+                name,
+                code,
+                parents: parents.map(parent => parent._id)
+            });
+            // save child
+            const newChild = await child.save();
+            // update parents with new child
+            parents.forEach(async parent => {
+                parent.children.push(newChild._id);
+                await parent.save();
+            });
+            res.status(201).json(newChild);
+        }
+        catch(error){
+            res.status(400).json({ message: error.message });
+        }
+    }else {
+        res.status(403).json({ message: 'Forbidden: Only parents can create children' });
     }
 };
 
