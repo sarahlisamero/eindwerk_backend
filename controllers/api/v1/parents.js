@@ -4,6 +4,17 @@ const Task = require('../../../models/Task');
 //const { handleProfilePictureUpload } = require ('../../../controllers/api/v1/upload');
 const uploadController = require('./upload');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (parentId, admin) => {
+    const secretKey = process.env.JWT_SECRET;
+
+    if (!secretKey) {
+        throw new Error('JWT_SECRET is not defined in the environment variables.');
+    }
+
+    return jwt.sign({ parentId, admin }, secretKey, { expiresIn: '1h' });
+};
 
 const signup = async (req, res) => {
     const { username, password, admin } = req.body;
@@ -19,7 +30,9 @@ const signup = async (req, res) => {
         const parent = new Parent({ username, password: hashedPassword, admin });
         const newParent = await parent.save();
 
-        res.status(201).json(newParent);
+        const token = generateToken(newParent._id, newParent.admin);
+
+        res.status(201).json({ newParent, token });;
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -39,6 +52,8 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+
+        const token = generateToken(parent._id, parent.admin);
 
         res.json({ message: 'Login successful' });
     } catch (error) {

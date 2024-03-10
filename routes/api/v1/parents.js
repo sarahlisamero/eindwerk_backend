@@ -3,7 +3,7 @@ const router = express.Router();
 
 const parentsController = require('../../../controllers/api/v1/parents');
 const upload = require('../../../middlewares/upload');
-const authController = require('../../../controllers/api/v1/auth');
+const authController = require('../../../middlewares/auth');
 
 //signup
 router.post('/signup', parentsController.signup);
