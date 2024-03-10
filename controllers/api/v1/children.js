@@ -76,7 +76,7 @@ function generateCode(){
 }
 
 // isChildExisting function
-const isChildExisting = async (req, res) => {
+/*const isChildExisting = async (req, res) => {
     const { name, code, parents: parentIds } = req.body; 
 
     try {
@@ -111,7 +111,29 @@ const isChildExisting = async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
-};
+};*/
+
+const checkChildCredentials = async (req, res) => {
+    const { name, code } = req.body;
+    console.log('Received credentials:', name, code);
+    const parentId = req.params.parentId;
+    try {
+        const child = await Child.findOne({ name: name, code: code }).populate('parents');
+        if (!child) {
+            res.status(404).json({ message: 'Invalid credentials.' });
+        } 
+        const parent = await Parent.findById(parentId);
+        if (!parent) {
+            res.status(404).json({ message: 'Parent not found.' });
+        }
+        parent.children.push(child._id);
+        await parent.save();
+
+        res.json({ message: 'Credentials matched and child added to parent.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 const deleteChild = async (req, res) => {
     try {
@@ -156,4 +178,5 @@ module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
 module.exports.deleteChild = deleteChild;
 module.exports.updateChildUsername = updateChildUsername;
-module.exports.isChildExisting = isChildExisting;
+//module.exports.isChildExisting = isChildExisting;
+module.exports.checkChildCredentials = checkChildCredentials;
