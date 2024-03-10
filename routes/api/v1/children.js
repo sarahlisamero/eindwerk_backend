@@ -10,6 +10,7 @@ router.get('/', /*passport.authenticate('jwt', {session: false}),*/ childrenCont
 router.get('/:id', childrenController.getChildById);
 //post
 router.post('/', childrenController.createChild);
+router.post('/existing', childrenController.isChildExisting); // New route for checking and linking child
 router.post('/:id/profilePicture', upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
 router.post('/:id/document', upload.single('document'), childrenController.uploadChildDocument);
 //delete

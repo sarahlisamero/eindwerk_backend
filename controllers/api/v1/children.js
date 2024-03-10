@@ -34,23 +34,25 @@ exports.uploadChildDocument = async (req, res) => {
     await uploadController.handleFileUpload(Child, req, res);
 };
 
+
+// createChild function
 const createChild = async (req, res) => {
-    const { name, /*code,*/ parents: parentIds } = req.body; 
+    const { name, parents: parentIds } = req.body; 
 
     try{
-        //generate a unique code for the child
+        // generate a unique code for the child
         const code = await generateCode();
-        //find parents 
+        // find parents 
         const parents = await Parent.find({ _id: { $in: parentIds } });
-        //create child object
+        // create child object
         const child = new Child({
             name,
             code,
             parents: parents.map(parent => parent._id)
         });
-        //save child
+        // save child
         const newChild = await child.save();
-        //update parents with new child
+        // update parents with new child
         parents.forEach(async parent => {
             parent.children.push(newChild._id);
             await parent.save();
@@ -62,6 +64,7 @@ const createChild = async (req, res) => {
     }
 };
 
+// generateCode function
 function generateCode(){
     const randomString = Math.random().toString(36).substring(2, 8);
     return Child.exists({ code: randomString }).then(exists => {
@@ -71,6 +74,44 @@ function generateCode(){
         return randomString;
     });
 }
+
+// isChildExisting function
+const isChildExisting = async (req, res) => {
+    const { name, code, parents: parentIds } = req.body; 
+
+    try {
+        // Check if a child with the given name and code exists
+        const existingChild = await Child.findOne({ name, code });
+
+        if (existingChild) {
+            // If child with the given name and code already exists, link it to the parent(s)
+            // Clear the existing parent references
+            existingChild.parents = [];
+
+            // Find parents 
+            const parents = await Parent.find({ _id: { $in: parentIds } });
+
+            // Link child to parent and parent to child
+            const promises = parents.map(async parent => {
+                parent.children.push(existingChild._id);
+                existingChild.parents.push(parent._id);
+                await parent.save(); // Save the parent
+            });
+
+            await Promise.all(promises);
+
+            // Save the child after all parent links have been established
+            await existingChild.save();
+
+            res.status(201).json(existingChild);
+        } else {
+            // If child with the given name and code does not exist, return an error response
+            res.status(400).json({ message: "Child with the provided name and code does not exist." });
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 
 const deleteChild = async (req, res) => {
     try {
@@ -115,3 +156,4 @@ module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
 module.exports.deleteChild = deleteChild;
 module.exports.updateChildUsername = updateChildUsername;
+module.exports.isChildExisting = isChildExisting;
