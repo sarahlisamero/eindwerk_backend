@@ -3,21 +3,21 @@ const router = express.Router();
 
 const parentsController = require('../../../controllers/api/v1/parents');
 const upload = require('../../../middlewares/upload');
-const authController = require('../../../middlewares/auth');
+const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyToken middleware
 
 //signup
 router.post('/signup', parentsController.signup);
 //login
 router.post('/login', parentsController.login);
 //get
-router.get('/', parentsController.getAllParents);
-router.get('/:id', parentsController.getParentById);
+router.get('/', authorizeAdmin, parentsController.getAllParents);
+router.get('/:id', authorizeAdmin, parentsController.getParentById);
 //post
 router.post('/', parentsController.createParent);
-router.post('/:id/profilePicture', upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
+router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
 //delete
-router.delete('/:id', parentsController.deleteParent);
+router.delete('/:id', authorizeAdmin, parentsController.deleteParent);
 //put
-router.put('/:id/username', parentsController.updateParentUsername);
+router.put('/:id/username', authorizeAdmin, parentsController.updateParentUsername);
 
 module.exports = router;
