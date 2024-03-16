@@ -7,16 +7,16 @@ const upload = require('../../../middlewares/upload');
 const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyToken middleware
 
 //get
-router.get('/', /*passport.authenticate('jwt', {session: false}),*/ childrenController.getAllChildren);
-router.get('/:id', childrenController.getChildById);
+router.get('/', authorizeAdmin, childrenController.getAllChildren);
+router.get('/:id', authorizeAdmin, childrenController.getChildById);
 //post
-router.post('/',authorizeAdmin, childrenController.createChild);
-router.post('/existing', childrenController.isChildExisting); // New route for checking and linking child
-router.post('/:id/profilePicture', upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
-router.post('/:id/document', upload.single('document'), childrenController.uploadChildDocument);
+router.post('/', authorizeAdmin, childrenController.createChild);
+router.post('/existing', authorizeAdmin, childrenController.isChildExisting); // New route for checking and linking child
+router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
+router.post('/:id/document', authorizeAdmin, upload.single('document'), childrenController.uploadChildDocument);
 //delete
-router.delete('/:id', childrenController.deleteChild);
+router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 //put
-router.put('/:id/username', childrenController.updateChildUsername);
+router.put('/:id/username', authorizeAdmin, childrenController.updateChildUsername);
 
 module.exports = router;
