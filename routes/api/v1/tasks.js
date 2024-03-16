@@ -3,11 +3,12 @@ const router = express.Router();
 
 const tasksController = require('../../../controllers/api/v1/tasks');
 const upload = require('../../../middlewares/upload');
+const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyToken middleware
 
-router.post('/', tasksController.createTask);
-router.post('/:id/taskPicture', upload.single('taskPicture'), tasksController.uploadTaskPicture);
-router.post('/:id/audio', upload.single('audio'), tasksController.uploadAudio);
+router.post('/', authorizeAdmin, tasksController.createTask);
+router.post('/:id/taskPicture', authorizeAdmin, upload.single('taskPicture'), tasksController.uploadTaskPicture);
+router.post('/:id/audio', authorizeAdmin, upload.single('audio'), tasksController.uploadAudio);
 router.get('/:id', tasksController.getTaskById);
-router.get('/children/:childId', tasksController.getTasksByChildId);
+router.get('/children/:childId', authorizeAdmin, tasksController.getTasksByChildId);
 
 module.exports = router;
