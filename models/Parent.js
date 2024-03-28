@@ -19,6 +19,7 @@ const Parent = new Schema({
     }], //many to many relationship
     profilePicture: {
         type: String,
+        default: 'https://albanyvet.com.au/wp-content/uploads/2019/11/blank-profile-picture-973460_640.png',
     },
 });
 

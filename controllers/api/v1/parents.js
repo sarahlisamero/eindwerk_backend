@@ -54,8 +54,9 @@ const login = async (req, res) => {
         }
 
         const token = generateToken(parent._id, parent.admin);
+        const parentid = parent._id;
 
-        res.json({ message: 'Login successful', token });;
+        res.json({ message: 'Login successful', token, parentid});;
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
