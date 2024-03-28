@@ -83,6 +83,9 @@ const checkChildCredentials = async (req, res) => {
     const { name, code} = req.body;
     console.log('Received credentials:', name, code);
     const parentId = req.params.parentId;
+    if (!name || !code) {
+        return res.status(400).json({ message: 'Naam en code zijn verplicht.' });
+    }
     try{
      //find child and check credentials
         const child = await Child.findOne({ name: name, code: code }).populate('parents');
@@ -96,7 +99,7 @@ const checkChildCredentials = async (req, res) => {
         }
         // Check if child is already linked to the parent
         if (parent.children.includes(child._id)) {
-            return res.status(400).json({ message: 'Child & parent are already linked' });
+            return res.status(400).json({ message: 'Kind en ouder zijn al gelinkt.' });
         }
         //link parent and child
         parent.children.push(child._id);
@@ -120,7 +123,7 @@ const deleteChild = async (req, res) => {
             { $pull: { children: childId } 
         });
         await Child.findByIdAndDelete(childId);
-        res.json({ message: 'Child deleted successfully' });
+        res.json({ message: 'Kind account is succesvol verwijderd.' });
     }
     catch(error){
         res.status(500).json({ message: error.message });

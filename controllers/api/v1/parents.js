@@ -18,11 +18,14 @@ const generateToken = (parentId, admin) => {
 
 const signup = async (req, res) => {
     const { username, password, admin } = req.body;
-
+    // Check if username or password is empty
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
     try {
         const existingParent = await Parent.findOne({ username });
         if (existingParent) {
-            return res.status(400).json({ message: 'Username already exists' });
+            return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10); 
@@ -40,17 +43,19 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     const { username, password } = req.body;
-
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Gebruikersnaam en Wachtwoord zijn verplicht.' });
+    }
     try {
         const parent = await Parent.findOne({ username });
 
         if (!parent) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Gegevens komen niet overeen.' });
         }
 
         const passwordMatch = await bcrypt.compare(password, parent.password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Gegevens komen niet overeen.' });
         }
 
         const token = generateToken(parent._id, parent.admin);
@@ -78,7 +83,7 @@ const getParentById = async (req, res) => {
             res.json(parent);
         }
         else{
-            res.status(404).json({ message: 'Parent not found' });
+            res.status(404).json({ message: 'Ouder niet gevonden.' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -118,7 +123,7 @@ const deleteParent = async (req, res) => {
         await Task.deleteMany({ _id: { $in: children.map(child => child.tasks).flat() } });
 
         await Parent.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Parent deleted successfully' });
+        res.json({ message: 'Account is succesvol verwijderd.' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
