@@ -20,12 +20,12 @@ const signup = async (req, res) => {
     const { username, password, admin } = req.body;
     // Check if username or password is empty
     if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
+        return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
     }
     try {
         const existingParent = await Parent.findOne({ username });
         if (existingParent) {
-            return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
+            return res.status(400).json({ message: 'Gebruiker bestaat al.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10); 

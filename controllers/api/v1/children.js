@@ -19,7 +19,7 @@ const getChildById = async (req, res) => {
             res.json(child);
         }
         else{
-            res.status(404).json({ message: 'Child not found' });
+            res.status(404).json({ message: 'Kind account is niet gevonden.' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -39,8 +39,15 @@ exports.uploadChildDocument = async (req, res) => {
 const createChild = async (req, res) => {
     if (req.user.admin){
         const { name, parents: parentIds } = req.body; 
-
+        if (!name) {
+            return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
+        }
         try{
+            //if child already exists
+            const existingChild = await Child.findOne({ name: name });
+            if (existingChild) {
+                return res.status(400).json({ message: 'Gebruikersnaam van kind bestaat al.' });
+            }
             // generate a unique code for the child
             const code = await generateCode();
             // find parents 
@@ -64,7 +71,7 @@ const createChild = async (req, res) => {
             res.status(400).json({ message: error.message });
         }
     }else {
-        res.status(403).json({ message: 'Forbidden: Only parents can create children' });
+        res.status(403).json({ message: 'Je hebt niet de juiste rechten voor deze actie.' });
     }
 };
 
@@ -90,12 +97,12 @@ const checkChildCredentials = async (req, res) => {
      //find child and check credentials
         const child = await Child.findOne({ name: name, code: code }).populate('parents');
         if (!child) {
-            return res.status(404).json({ message: 'Invalid credentials.' });
+            return res.status(404).json({ message: 'Onjuiste gegevens.' });
         } 
         //find parent
         const parent = await Parent.findById(parentId);
         if (!parent) {
-            return res.status(404).json({ message: 'Parent not found.' });
+            return res.status(404).json({ message: 'Ouder is niet gevonden.' });
         }
         // Check if child is already linked to the parent
         if (parent.children.includes(child._id)) {
@@ -116,7 +123,7 @@ const deleteChild = async (req, res) => {
         const childId = req.params.id;
         const child = await Child.findById(childId);
         if(!child){
-            return res.status(404).json({ message: 'Child not found' });
+            return res.status(404).json({ message: 'Kind account is niet gevonden.' });
         }
         await Parent.updateMany(
             { _id: { $in: child.parents } }, 
@@ -137,7 +144,7 @@ const updateChildUsername = async (req, res) => {
     try {
         const child = await Child.findById(id);
         if (!child) {
-            return res.status(404).json({ message: 'Child not found' });
+            return res.status(404).json({ message: 'Kind account is niet gevonden.' });
         }
 
         child.name = name;
