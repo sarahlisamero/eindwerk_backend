@@ -8,27 +8,19 @@ const taskSchema = new Schema({
     },
     duration: {
         type: Number,
-        required: true,
+        required: false,
     },
-    timeMorning: {
-        type: String,
-        required: true,
-    },
-    timeAfternoon: {
-        type: String,
-        required: true,
-    },
-    timeEvening: {
+    startTime: {
         type: String,
         required: true,
     },
     completed: {
         type: Boolean,
-        required: true,
+        required: false,
     },
     date: {
         type: Date,
-        required: true,
+        required: false,
     },
     allDays: {
         type: Boolean,

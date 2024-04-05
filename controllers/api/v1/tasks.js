@@ -7,9 +7,7 @@ const createTask = async (req, res) => {
     const task = new Task({
         name: req.body.name,
         duration: req.body.duration,
-        timeMorning: req.body.timeMorning,
-        timeAfternoon: req.body.timeAfternoon,
-        timeEvening: req.body.timeEvening,
+        startTime: req.body.startTime,
         completed: req.body.completed,
         date: req.body.date,
         allDays: req.body.allDays,
