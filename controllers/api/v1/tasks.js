@@ -15,6 +15,13 @@ const createTask = async (req, res) => {
         child: req.body.child,
         startHour: req.body.startHour,
         endHour: req.body.endHour,
+        monday: req.body.monday,
+        tuesday: req.body.tuesday,
+        wednesday: req.body.wednesday,
+        thursday: req.body.thursday,
+        friday: req.body.friday,
+        saturday: req.body.saturday,
+        sunday: req.body.sunday,
     });
 
     try {

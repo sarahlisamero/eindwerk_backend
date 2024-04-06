@@ -38,6 +38,34 @@ const taskSchema = new Schema({
         type: String,
         required: false,
     },
+    monday: {
+        type: Boolean,
+        default: false,
+    },
+    tuesday: {
+        type: Boolean,
+        default: false,
+    },
+    wednesday: {
+        type: Boolean,
+        default: false,
+    },
+    thursday: {
+        type: Boolean,
+        default: false,
+    },
+    friday: {
+        type: Boolean,
+        default: false,
+    },
+    saturday: {
+        type: Boolean,
+        default: false,
+    },
+    sunday: {
+        type: Boolean,
+        default: false,
+    },
     child: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Child',
