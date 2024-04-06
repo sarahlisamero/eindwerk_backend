@@ -10,10 +10,6 @@ const taskSchema = new Schema({
         type: Number,
         required: false,
     },
-    startTime: {
-        type: String,
-        required: true,
-    },
     completed: {
         type: Boolean,
         required: false,
@@ -22,9 +18,25 @@ const taskSchema = new Schema({
         type: Date,
         required: false,
     },
-    allDays: {
+    morningSelect: {
         type: Boolean,
-        /*required: true,*/
+        default: false,
+    },
+    noonSelect: {
+        type: Boolean,
+        default: false,
+    },
+    eveningSelect: {
+        type: Boolean,
+        default: false,
+    },
+    startHour: {
+        type: String,
+        required: false,
+    },
+    endHour: {
+        type: String,
+        required: false,
     },
     child: {
         type: mongoose.Schema.Types.ObjectId,
