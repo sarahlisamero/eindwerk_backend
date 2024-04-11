@@ -66,6 +66,10 @@ const taskSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    glassesPerDay: {
+        type: Number,
+        required: false,
+    },
     child: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Child',
