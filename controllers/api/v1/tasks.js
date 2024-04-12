@@ -23,6 +23,7 @@ const createTask = async (req, res) => {
         saturday: req.body.saturday,
         sunday: req.body.sunday,
         glassesPerDay: req.body.glassesPerDay,
+        taskPicture: req.body.taskPicture,
     });
 
     try {
