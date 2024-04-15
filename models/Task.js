@@ -38,31 +38,31 @@ const taskSchema = new Schema({
         type: String,
         required: false,
     },
-    monday: {
+    ma: {
         type: Boolean,
         default: false,
     },
-    tuesday: {
+    di: {
         type: Boolean,
         default: false,
     },
-    wednesday: {
+    woe: {
         type: Boolean,
         default: false,
     },
-    thursday: {
+    do: {
         type: Boolean,
         default: false,
     },
-    friday: {
+    vrij: {
         type: Boolean,
         default: false,
     },
-    saturday: {
+    za: {
         type: Boolean,
         default: false,
     },
-    sunday: {
+    zo: {
         type: Boolean,
         default: false,
     },
