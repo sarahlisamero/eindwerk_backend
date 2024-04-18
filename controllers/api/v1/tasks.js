@@ -28,6 +28,15 @@ const createTask = async (req, res) => {
 
     try {
         const newTask = await task.save();
+        const child = await Child.findById(req.body.child);
+
+        if (!child) {
+            return res.status(404).json({ message: 'Child not found.' });
+        }
+
+        child.tasks.push(newTask._id);
+        await child.save();
+
         res.status(201).json(newTask);
     } catch (error) {
         res.status(400).json({ message: error.message });
