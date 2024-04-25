@@ -30,11 +30,27 @@ const taskSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    startHour: {
+    morningStart: {
         type: String,
         required: false,
     },
-    endHour: {
+    morningEnd: {
+        type: String,
+        required: false,
+    },
+    noonStart: {
+        type: String,
+        required: false,
+    },
+    noonEnd: {
+        type: String,
+        required: false,
+    },
+    eveningStart: {
+        type: String,
+        required: false,
+    },
+    eveningEnd: {
         type: String,
         required: false,
     },
