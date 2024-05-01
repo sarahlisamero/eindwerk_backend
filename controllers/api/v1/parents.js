@@ -103,10 +103,6 @@ const getParentById = async (req, res) => {
     }
 }
 
-// exports.uploadParentProfilePicture = async (req, res) => {
-//     await uploadController.handleFileUpload(Parent, req, res);
-// };
-
 exports.uploadParentProfilePicture = async (req, res) => {
     // Extract user ID from route parameters
     const userId = req.params.id; 
