@@ -13,7 +13,9 @@ router.get('/:id', authorizeAdmin, childrenController.getChildById);
 router.post('/', authorizeAdmin, childrenController.createChild);
 router.post('/:parentId/credentials', authorizeAdmin, childrenController.checkChildCredentials);
 router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
+router.get('/:id/document', authorizeAdmin, childrenController.getChildDocuments);
 router.post('/:id/document', authorizeAdmin, upload.single('document'), childrenController.uploadChildDocument);
+//router.post('/:id/document', authorizeAdmin, upload.single('document'), childrenController.uploadChildDocument);
 //delete
 router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 //put

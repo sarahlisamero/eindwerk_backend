@@ -80,9 +80,41 @@ exports.uploadChildProfilePicture = async (req, res) => {
 };
 
 exports.uploadChildDocument = async (req, res) => {
-    await uploadController.handleFileUpload(Child, req, res);
-};
+    const childId = req.params.id; // Extract child ID from route parameters
+    if (!childId) {
+        return res.status(401).json({ success: false, message: 'Child ID not provided!' });
+    }
 
+    try {
+        // Check if the child exists
+        const existingChild = await Child.findById(childId);
+        if (!existingChild) {
+            return res.status(404).json({ success: false, message: 'Child not found' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload file to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        existingChild.document.push({
+            url: result.secure_url,
+            public_id: result.public_id
+        });
+        
+
+        // Save the updated child object
+        const updatedChild = await existingChild.save();
+
+        // Return success response with updated child object
+        res.status(201).json({ success: true, message: 'Document uploaded successfully!', child: updatedChild });
+    } catch (error) {
+        console.error('Error while uploading child document:', error);
+        res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+    }
+};
 
 // Controller method to get documents for a specific child
 exports.getChildDocuments = async (req, res) => {
@@ -99,6 +131,28 @@ exports.getChildDocuments = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+// exports.uploadChildDocument = async (req, res) => {
+//     await uploadController.handleFileUpload(Child, req, res);
+// };
+
+
+// // Controller method to get documents for a specific child
+// exports.getChildDocuments = async (req, res) => {
+//     try {
+//         const childId = req.params.id;
+//         const child = await Child.findById(childId);
+//         if (!child) {
+//             return res.status(404).json({ error: 'Child not found' });
+//         }
+//         const documents = child.document;
+//         res.json(documents);
+//     } catch (error) {
+//         console.error('Error fetching child documents:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// };
 
 
 
