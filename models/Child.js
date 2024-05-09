@@ -23,8 +23,19 @@ const childSchema = new Schema({
         default: 'https://albanyvet.com.au/wp-content/uploads/2019/11/blank-profile-picture-973460_640.png',
     },
     document: [{
-        type: String,
+        url: {
+            type: String,
+            required: true
+        },
+        public_id: {
+            type: String,
+            required: true
+        }
     }]
+    // document: [{
+    //     url: String,
+    //     public_id: String
+    // }]
 });
 
 const Child = mongoose.model('Child', childSchema);
