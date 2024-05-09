@@ -18,5 +18,6 @@ router.post('/:id/document', authorizeAdmin, upload.single('document'), children
 router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 //put
 router.put('/:id/username', authorizeAdmin, childrenController.updateChildUsername);
+router.put('/:id/avatar', authorizeAdmin, childrenController.updateChildAvatar);
 
 module.exports = router;
