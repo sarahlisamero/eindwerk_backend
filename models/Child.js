@@ -24,7 +24,11 @@ const childSchema = new Schema({
     },
     document: [{
         type: String,
-    }]
+    }],
+    avatar: {
+        type: String,
+        default: 'https://yadinam.be/images/kiboe_zwaai.png',
+    }
 });
 
 const Child = mongoose.model('Child', childSchema);
