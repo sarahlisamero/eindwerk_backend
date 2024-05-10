@@ -28,7 +28,11 @@ const childSchema = new Schema({
     avatar: {
         type: String,
         default: 'https://yadinam.be/images/kiboe_zwaai.png',
-    }
+    },
+    points: {
+        type: Number,
+        default: 20,
+    },
 });
 
 const Child = mongoose.model('Child', childSchema);
