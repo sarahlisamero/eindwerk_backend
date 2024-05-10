@@ -19,5 +19,6 @@ router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 //put
 router.put('/:id/username', authorizeAdmin, childrenController.updateChildUsername);
 router.put('/:id/avatar', authorizeAdmin, childrenController.updateChildAvatar);
+router.put('/:id/points', authorizeAdmin, childrenController.updatePoints);
 
 module.exports = router;

@@ -106,7 +106,7 @@ exports.getChildDocuments = async (req, res) => {
 // Create a new child
 const createChild = async (req, res) => {
     if (req.user.admin) {
-        const { name, parents: parentIds, profilePicture, avatar } = req.body; // Include profilePicture in the request body
+        const { name, parents: parentIds, profilePicture, avatar, points } = req.body; // Include profilePicture in the request body
         if (!name) {
             return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
         }
@@ -126,7 +126,8 @@ const createChild = async (req, res) => {
                 code,
                 parents: parents.map(parent => parent._id),
                 profilePicture: profilePicture, // Store the Cloudinary URL in the database
-                avatar: avatar
+                avatar: avatar,
+                points: points
             });
             // Save child
             const newChild = await child.save();
@@ -245,6 +246,26 @@ const updateChildAvatar = async (req, res) => {
     }
 };
 
+const updatePoints = async (req, res) => {
+    const { id } = req.params;
+    const { points } = req.body;
+  
+    try {
+      const child = await Child.findById(id);
+      if (!child) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      child.points -= points;
+      await child.save();
+  
+      res.status(200).json({ message: 'Points updated successfully', points: child.points });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
 module.exports.getAllChildren = getAllChildren;
 module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
@@ -252,6 +273,7 @@ module.exports.deleteChild = deleteChild;
 module.exports.updateChildUsername = updateChildUsername;
 module.exports.checkChildCredentials = checkChildCredentials;
 module.exports.updateChildAvatar = updateChildAvatar;
+module.exports.updatePoints = updatePoints;
 
 
 
