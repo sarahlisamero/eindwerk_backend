@@ -265,6 +265,25 @@ const updatePoints = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+  const addPoints = async (req, res) => {
+    const { id } = req.params;
+    const { points } = req.body;
+
+    try {
+        const child = await Child.findById(id);
+        if (!child) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        child.points += points;
+        await child.save();
+
+        res.status(200).json({ message: 'Points added successfully', points: child.points });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+ };
 
 module.exports.getAllChildren = getAllChildren;
 module.exports.getChildById = getChildById;
@@ -274,6 +293,7 @@ module.exports.updateChildUsername = updateChildUsername;
 module.exports.checkChildCredentials = checkChildCredentials;
 module.exports.updateChildAvatar = updateChildAvatar;
 module.exports.updatePoints = updatePoints;
+module.exports.addPoints = addPoints;
 
 
 

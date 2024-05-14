@@ -20,5 +20,6 @@ router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 router.put('/:id/username', authorizeAdmin, childrenController.updateChildUsername);
 router.put('/:id/avatar', authorizeAdmin, childrenController.updateChildAvatar);
 router.put('/:id/points', authorizeAdmin, childrenController.updatePoints);
+router.put('/:id/addPoints', authorizeAdmin, childrenController.addPoints);
 
 module.exports = router;
