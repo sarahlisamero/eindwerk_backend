@@ -14,7 +14,10 @@ router.get('/', authorizeAdmin, parentsController.getAllParents);
 router.get('/:id', authorizeAdmin, parentsController.getParentById);
 //post
 router.post('/', parentsController.createParent);
-router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
+
+router.post('/verify-password', parentsController.verifyPassword);
+
+router.post('/:id/profilePicture', upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
 //delete
 router.delete('/:id', authorizeAdmin, parentsController.deleteParent);
 //put
