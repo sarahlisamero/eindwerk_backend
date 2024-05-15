@@ -76,6 +76,24 @@ const getTasksByChildId = async (req, res) => {
     }
 };
 
+const updateTask = async (req, res) => {
+    const updates = req.body;
+    const taskId = req.params.id;
+
+    try {
+        const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json(task);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
 module.exports.getTasksByChildId = getTasksByChildId;
+module.exports.updateTask = updateTask;
