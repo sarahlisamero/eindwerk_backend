@@ -76,6 +76,31 @@ const getTasksByChildId = async (req, res) => {
     }
 };
 
+const updateTask = async (req, res) => {
+    const updates = req.body;
+    const taskId = req.params.id;
+
+    try {
+        const task = await Task.findById(taskId);
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // Update only the fields that are provided in the request body
+        Object.keys(updates).forEach(key => {
+            task[key] = updates[key];
+        });
+
+        await task.save();
+
+        res.json(task);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
 module.exports.getTasksByChildId = getTasksByChildId;
+module.exports.updateTask = updateTask;

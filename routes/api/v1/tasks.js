@@ -10,5 +10,6 @@ router.post('/:id/taskPicture', authorizeAdmin, upload.single('taskPicture'), ta
 router.post('/:id/audio', authorizeAdmin, upload.single('audio'), tasksController.uploadAudio);
 router.get('/:id', tasksController.getTaskById);
 router.get('/children/:childId', authorizeAdmin, tasksController.getTasksByChildId);
+router.put('/:id', authorizeAdmin, tasksController.updateTask); 
 
 module.exports = router;
