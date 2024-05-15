@@ -140,6 +140,31 @@ exports.uploadParentProfilePicture = async (req, res) => {
     }
 };
 
+// Add a new controller method to verify the password
+const verifyPassword = async (req, res) => {
+    const { parentid, password } = req.body;
+
+    try {
+        const parent = await Parent.findById(parentid);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found' });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, parent.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
+
+        // Password is correct, send success response
+        res.status(200).json({ message: 'Password verified successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.verifyPassword = verifyPassword;
+
+
 
 
 const createParent = async (req, res) => {
@@ -202,3 +227,4 @@ module.exports.deleteParent = deleteParent;
 module.exports.updateParentUsername = updateParentUsername;
 module.exports.signup = signup;
 module.exports.login = login;
+
