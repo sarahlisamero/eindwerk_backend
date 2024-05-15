@@ -81,11 +81,18 @@ const updateTask = async (req, res) => {
     const taskId = req.params.id;
 
     try {
-        const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
+        const task = await Task.findById(taskId);
 
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }
+
+        // Update only the fields that are provided in the request body
+        Object.keys(updates).forEach(key => {
+            task[key] = updates[key];
+        });
+
+        await task.save();
 
         res.json(task);
     } catch (error) {
