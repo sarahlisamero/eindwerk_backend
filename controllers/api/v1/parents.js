@@ -30,7 +30,7 @@ const generateToken = (parentId, admin) => {
 };
 
 const signup = async (req, res) => {
-    const { username, password, admin } = req.body;
+    const { username, password, profilePicture } = req.body; // Extract profilePicture from request body
     // Check if username or password is empty
     if (!username || !password) {
         return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
@@ -43,16 +43,42 @@ const signup = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10); 
 
-        const parent = new Parent({ username, password: hashedPassword, admin });
+        const parent = new Parent({ username, password: hashedPassword, profilePicture }); // Include profilePicture
         const newParent = await parent.save();
 
         const token = generateToken(newParent._id, newParent.admin);
 
-        res.status(201).json({ newParent, token });;
+        res.status(201).json({ newParent, token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+// const signup = async (req, res) => {
+//     const { username, password, admin } = req.body;
+//     // Check if username or password is empty
+//     if (!username || !password) {
+//         return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
+//     }
+//     try {
+//         const existingParent = await Parent.findOne({ username });
+//         if (existingParent) {
+//             return res.status(400).json({ message: 'Gebruiker bestaat al.' });
+//         }
+
+//         const hashedPassword = await bcrypt.hash(password, 10); 
+
+//         const parent = new Parent({ username, password: hashedPassword, admin });
+//         const newParent = await parent.save();
+
+//         const token = generateToken(newParent._id, newParent.admin);
+
+//         res.status(201).json({ newParent, token });;
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
 
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -139,6 +165,29 @@ exports.uploadParentProfilePicture = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
     }
 };
+
+const uploadProfilePictureDuringSignup = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload file to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'profile_pictures', // Optional: You can organize uploaded images into folders
+            width: 500,
+            height: 500,
+            crop: 'fill',
+        });
+
+        // Return the Cloudinary URL of the uploaded profile picture
+        res.status(201).json({ success: true, message: 'Profile picture uploaded successfully', profilePictureUrl: result.secure_url });
+    } catch (error) {
+        console.error('Error while uploading parent profile image during signup:', error);
+        res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+    }
+};
+
 
 // Add a new controller method to verify the password
 const verifyPassword = async (req, res) => {
@@ -227,4 +276,5 @@ module.exports.deleteParent = deleteParent;
 module.exports.updateParentUsername = updateParentUsername;
 module.exports.signup = signup;
 module.exports.login = login;
+module.exports.uploadProfilePictureDuringSignup = uploadProfilePictureDuringSignup;
 
