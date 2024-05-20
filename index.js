@@ -1,8 +1,9 @@
+require ('dotenv').config();
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require ('dotenv').config();
+
 //const passport = require('./passport/passport');
 const port = 3000;
 
@@ -11,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 mongoose.connect(process.env.MONGODB);
-console.log(process.env.MONGODB);
+//console.log(process.env.MONGODB);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
