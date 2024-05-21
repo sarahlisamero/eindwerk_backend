@@ -80,25 +80,60 @@ exports.uploadChildProfilePicture = async (req, res) => {
 };
 
 exports.uploadChildDocument = async (req, res) => {
-    await uploadController.handleFileUpload(Child, req, res);
+    const childId = req.params.id;
+
+    if (!childId) {
+        return res.status(400).json({ success: false, message: 'Child ID not provided' });
+    }
+
+    try {
+        // Retrieve childId from the request parameters and validate it
+        const existingChild = await Child.findById(childId);
+        if (!existingChild) {
+            return res.status(404).json({ success: false, message: 'Child not found' });
+        }
+
+        // Check if a file is uploaded
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload the file to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        // Save document details to the existing child
+        existingChild.document.push({
+            url: result.secure_url,
+            public_id: result.public_id
+        });
+
+        // Save the updated child
+        const updatedChild = await existingChild.save();
+
+        // Respond with success message and updated child details
+        res.status(201).json({ success: true, message: 'Document uploaded successfully', child: updatedChild });
+    } catch (error) {
+        console.error('Error while uploading child document:', error);
+        res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+    }
 };
 
 
-// Controller method to get documents for a specific child
 exports.getChildDocuments = async (req, res) => {
     try {
         const childId = req.params.id;
         const child = await Child.findById(childId);
         if (!child) {
-            return res.status(404).json({ error: 'Child not found' });
+            return res.status(404).json({ success: false, message: 'Child not found' });
         }
         const documents = child.document;
-        res.json(documents);
+        res.status(200).json({ success: true, documents });
     } catch (error) {
         console.error('Error fetching child documents:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
     }
 };
+
 
 
 
