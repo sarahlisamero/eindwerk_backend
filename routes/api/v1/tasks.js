@@ -8,6 +8,7 @@ const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyTok
 router.post('/', authorizeAdmin, tasksController.createTask);
 router.post('/:id/taskPicture', authorizeAdmin, upload.single('taskPicture'), tasksController.uploadTaskPicture);
 router.post('/:id/audio', authorizeAdmin, upload.single('audio'), tasksController.uploadAudio);
+router.get('/:id/audio', tasksController.getTaskAudio);
 router.get('/:id', tasksController.getTaskById);
 router.get('/children/:childId', authorizeAdmin, tasksController.getTasksByChildId);
 router.put('/:id', authorizeAdmin, tasksController.updateTask); 
