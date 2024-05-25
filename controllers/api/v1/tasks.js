@@ -4,6 +4,8 @@ const Task = require('../../../models/Task');
 const uploadController = require('./upload');
 
 const createTask = async (req, res) => {
+    console.log('Create Task Request Body:', req.body);
+
     const task = new Task({
         name: req.body.name,
         duration: req.body.duration,
@@ -28,7 +30,10 @@ const createTask = async (req, res) => {
         zo: req.body.zo,
         glassesPerDay: req.body.glassesPerDay,
         taskPicture: req.body.taskPicture,
+        audio: req.body.audio,
     });
+
+    console.log('Task to be saved:', task);
 
     try {
         const newTask = await task.save();
@@ -43,6 +48,7 @@ const createTask = async (req, res) => {
 
         res.status(201).json(newTask);
     } catch (error) {
+        console.error('Error creating task:', error.message);
         res.status(400).json({ message: error.message });
     }
 };
@@ -54,6 +60,19 @@ exports.uploadTaskPicture = async (req, res) => {
 exports.uploadAudio = async (req, res) => {
     await uploadController.handleFileUpload(Task, req, res);
 };
+
+const getTaskAudio = async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) {
+            return res.status(404).json({ message: 'Audio not found' });
+        }
+        res.json({ AudioUrl: task.audio });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 const getTaskById = async (req, res) => {
     try {
@@ -77,6 +96,7 @@ const getTasksByChildId = async (req, res) => {
 };
 
 const updateTask = async (req, res) => {
+    console.log('Update Task Request Body:', req.body);
     const updates = req.body;
     const taskId = req.params.id;
 
@@ -93,9 +113,10 @@ const updateTask = async (req, res) => {
         });
 
         await task.save();
-
+        console.log('Updated Task:', task);
         res.json(task);
     } catch (error) {
+        console.error('Error updating task:', error.message);
         res.status(400).json({ message: error.message });
     }
 };
@@ -104,3 +125,4 @@ module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
 module.exports.getTasksByChildId = getTasksByChildId;
 module.exports.updateTask = updateTask;
+module.exports.getTaskAudio = getTaskAudio;
