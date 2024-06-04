@@ -20,5 +20,6 @@ router.put('/:id', authorizeAdmin, tasksController.updateTask);
 
 //delete
 router.delete('/:id', authorizeAdmin, tasksController.deleteTask);
+router.delete('/name/:name/child/:childId', authorizeAdmin, tasksController.deleteTaskByNameAndChildId);
 
 module.exports = router;

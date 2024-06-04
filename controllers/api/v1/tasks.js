@@ -147,9 +147,38 @@ const deleteTask = async (req, res) => {
     }
 };
 
+const deleteTaskByNameAndChildId = async (req, res) => {
+    const { name, childId } = req.params;
+
+    try {
+        const task = await Task.findOne({ name: name, child: childId });
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        const taskId = task._id;
+
+        const child = await Child.findById(childId);
+
+        if (child) {
+            child.tasks.pull(taskId);
+            await child.save();
+        }
+
+        await Task.findByIdAndDelete(taskId);
+
+        res.status(200).json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting task:', error.message);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
 module.exports.getTasksByChildId = getTasksByChildId;
 module.exports.updateTask = updateTask;
 module.exports.getTaskAudio = getTaskAudio;
 module.exports.deleteTask = deleteTask;
+module.exports.deleteTaskByNameAndChildId = deleteTaskByNameAndChildId;
