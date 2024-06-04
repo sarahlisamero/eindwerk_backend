@@ -175,6 +175,37 @@ const deleteTaskByNameAndChildId = async (req, res) => {
     }
 };
 
+const patchChildTasksHours = async (req, res) => {
+    const childId = req.params.childId;
+    const { morningStart, morningEnd, noonStart, noonEnd, eveningStart, eveningEnd } = req.body;
+
+    try {
+        // Zoek alle taken van het specifieke kind
+        const tasks = await Task.find({ child: childId });
+
+        if (!tasks || tasks.length === 0) {
+            return res.status(404).json({ message: 'No tasks found for the specified child' });
+        }
+
+        // Loop door alle taken en update de uren
+        for (let i = 0; i < tasks.length; i++) {
+            const task = tasks[i];
+            if (morningStart !== undefined) task.morningStart = morningStart;
+            if (morningEnd !== undefined) task.morningEnd = morningEnd;
+            if (noonStart !== undefined) task.noonStart = noonStart;
+            if (noonEnd !== undefined) task.noonEnd = noonEnd;
+            if (eveningStart !== undefined) task.eveningStart = eveningStart;
+            if (eveningEnd !== undefined) task.eveningEnd = eveningEnd;
+            await task.save();
+        }
+
+        res.json({ message: 'Hours of all tasks for the specified child updated successfully' });
+    } catch (error) {
+        console.error('Error updating child tasks hours:', error.message);
+        res.status(400).json({ message: error.message });
+    }
+}
+
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
 module.exports.getTasksByChildId = getTasksByChildId;
@@ -182,3 +213,4 @@ module.exports.updateTask = updateTask;
 module.exports.getTaskAudio = getTaskAudio;
 module.exports.deleteTask = deleteTask;
 module.exports.deleteTaskByNameAndChildId = deleteTaskByNameAndChildId;
+module.exports.patchChildTasksHours = patchChildTasksHours;
