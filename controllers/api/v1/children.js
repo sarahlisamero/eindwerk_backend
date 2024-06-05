@@ -219,10 +219,10 @@ const checkChildCredentials = async (req, res) => {
 
         //link parent and child
         parent.children.push(child._id);
-        parent.adjustChildren = child._id;
+        parent.adjustChildren.push(child._id);
         await parent.save();
         
-        child.adjustBy = parent._id;
+        child.adjustBy.push(parent._id);
         child.parents.push(parent._id);
         await child.save();
     } catch (error) {
