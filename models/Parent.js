@@ -15,6 +15,10 @@ const Parent = new Schema({
         type: Boolean,
         default: true,
     },
+    role: { 
+        type: String,
+        enum: ['beheerder', 'bewerker', 'kijker'], 
+    },
     children: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Child' 

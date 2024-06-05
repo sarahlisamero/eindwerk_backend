@@ -141,7 +141,7 @@ exports.getChildDocuments = async (req, res) => {
 // Create a new child
 const createChild = async (req, res) => {
     if (req.user.admin) {
-        const { name, parents: parentIds, profilePicture, avatar, points, managedBy } = req.body; // Include profilePicture in the request body
+        const { name, parents: parentIds, profilePicture, avatar, points, managedBy, role } = req.body; // Include profilePicture in the request body
         if (!name) {
             return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
         }
@@ -163,14 +163,15 @@ const createChild = async (req, res) => {
                 profilePicture: profilePicture, // Store the Cloudinary URL in the database
                 avatar: avatar,
                 points: points,
-                managedBy: managedBy
+                managedBy: managedBy,
             });
             // Save child
             const newChild = await child.save();
             // Update parents with new child
             parents.forEach(async parent => {
                 parent.children.push(newChild._id);
-                parent.managedChildren.push(newChild._id); // Add the new child to managedChildren array
+                parent.managedChildren.push(newChild._id);
+                parent.role = 'beheerder';
                 await parent.save();
             });
             res.status(201).json(newChild);
