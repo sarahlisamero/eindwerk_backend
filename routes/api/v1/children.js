@@ -27,5 +27,6 @@ router.put('/:id/avatar', authorizeAdmin, childrenController.updateChildAvatar);
 router.put('/:id/points', authorizeAdmin, childrenController.updatePoints);
 router.put('/:id/addPoints', authorizeAdmin, childrenController.addPoints);
 router.put('/:childId/moveToLookBy/:parentId', authorizeAdmin, childrenController.moveChildToLookBy);
+router.put('/:childId/moveToAdjust/:parentId', authorizeAdmin, childrenController.moveChildToAdjust);
 
 module.exports = router;
