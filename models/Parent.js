@@ -19,6 +19,10 @@ const Parent = new Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Child' 
     }], //many to many relationship
+    managedChildren: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Child' 
+    }], //one to many relationship
     profilePicture: {
         type: String,
         default: 'https://albanyvet.com.au/wp-content/uploads/2019/11/blank-profile-picture-973460_640.png',
