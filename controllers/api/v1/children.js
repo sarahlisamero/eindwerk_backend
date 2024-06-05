@@ -141,7 +141,7 @@ exports.getChildDocuments = async (req, res) => {
 // Create a new child
 const createChild = async (req, res) => {
     if (req.user.admin) {
-        const { name, parents: parentIds, profilePicture, avatar, points, managedBy, role } = req.body; // Include profilePicture in the request body
+        const { name, parents: parentIds, profilePicture, avatar, points, managedBy } = req.body; // Include profilePicture in the request body
         if (!name) {
             return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
         }
@@ -171,7 +171,6 @@ const createChild = async (req, res) => {
             parents.forEach(async parent => {
                 parent.children.push(newChild._id);
                 parent.managedChildren.push(newChild._id);
-                parent.role = 'beheerder';
                 await parent.save();
             });
             res.status(201).json(newChild);
@@ -217,9 +216,13 @@ const checkChildCredentials = async (req, res) => {
         if (parent.children.includes(child._id)) {
             return res.status(400).json({ message: 'Kind en ouder zijn al gelinkt.' });
         }
+
         //link parent and child
         parent.children.push(child._id);
+        parent.adjustChildren = child._id;
         await parent.save();
+        
+        child.adjustBy = parent._id;
         child.parents.push(parent._id);
         await child.save();
     } catch (error) {

@@ -18,6 +18,14 @@ const childSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Parent' 
     },
+    adjustBy: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Parent' 
+    }],
+    lookBy: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Parent' 
+    }],
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task'

@@ -277,4 +277,3 @@ module.exports.updateParentUsername = updateParentUsername;
 module.exports.signup = signup;
 module.exports.login = login;
 module.exports.uploadProfilePictureDuringSignup = uploadProfilePictureDuringSignup;
-
