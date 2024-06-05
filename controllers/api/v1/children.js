@@ -326,6 +326,43 @@ const updatePoints = async (req, res) => {
     }
  };
 
+ const moveChildToLookBy = async (req, res) => {
+    const { childId, parentId } = req.params;
+
+    try {
+        const child = await Child.findById(childId);
+        if (!child) {
+            return res.status(404).json({ message: 'Child not found.' });
+        }
+
+        const parent = await Parent.findById(parentId);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found.' });
+        }
+
+        // Remove childId from adjustBy and add to lookBy
+        child.adjustBy = child.adjustBy.filter(id => id.toString() !== parentId);
+        if (!Array.isArray(child.lookBy)) {
+            child.lookBy = [];
+        }
+        child.lookBy.push(parentId);
+
+        // Remove childId from adjustChildren and add to lookChildren
+        parent.adjustChildren = parent.adjustChildren.filter(id => id.toString() !== childId);
+        if (!Array.isArray(parent.lookChildren)) {
+            parent.lookChildren = [];
+        }
+        parent.lookChildren.push(childId);
+
+        await Promise.all([child.save(), parent.save()]);
+
+        res.status(200).json({ message: 'Child moved to lookBy and parent moved to lookChildren successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 module.exports.getAllChildren = getAllChildren;
 module.exports.getChildById = getChildById;
 module.exports.createChild = createChild;
@@ -335,7 +372,7 @@ module.exports.checkChildCredentials = checkChildCredentials;
 module.exports.updateChildAvatar = updateChildAvatar;
 module.exports.updatePoints = updatePoints;
 module.exports.addPoints = addPoints;
-
+module.exports.moveChildToLookBy =moveChildToLookBy;
 
 
 
