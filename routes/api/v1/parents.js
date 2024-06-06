@@ -25,6 +25,7 @@ router.post('/signup/profilePicture', upload.single('profilePicture'), parentsCo
 router.delete('/:id', authorizeAdmin, parentsController.deleteParent);
 // Update parent username
 router.put('/:id/username', authorizeAdmin, parentsController.updateParentUsername);
+router.put('/:id/password', authorizeAdmin, parentsController.updateParentPassword);
 
 module.exports = router;
 

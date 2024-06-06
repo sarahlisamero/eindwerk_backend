@@ -269,6 +269,33 @@ const updateParentUsername = async (req, res) => {
     }
 };
 
+const updateParentPassword = async (req, res) => {
+    const { id } = req.params; // Parent ID
+    const { currentPassword, newPassword } = req.body; // Current and new password
+
+    try {
+        const parent = await Parent.findById(id);
+        if (!parent) {
+            return res.status(404).json({ message: 'Parent not found' });
+        }
+
+        // Verify current password
+        const isPasswordValid = await bcrypt.compare(currentPassword, parent.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid current password' });
+        }
+
+        // Hash and update new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        parent.password = hashedNewPassword;
+        const updatedParent = await parent.save();
+
+        res.json(updatedParent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports.getAllParents = getAllParents;
 module.exports.getParentById = getParentById;
 module.exports.createParent = createParent;
@@ -277,3 +304,4 @@ module.exports.updateParentUsername = updateParentUsername;
 module.exports.signup = signup;
 module.exports.login = login;
 module.exports.uploadProfilePictureDuringSignup = uploadProfilePictureDuringSignup;
+module.exports.updateParentPassword = updateParentPassword;
