@@ -268,6 +268,31 @@ const updateChildUsername = async (req, res) => {
     }
 };
 
+const updateChildProfile = async (req, res) => {
+    const { id } = req.params; // Child ID
+    const { name, profilePicture, avatar } = req.body; // Nieuwe gegevens
+
+    try {
+        const child = await Child.findById(id);
+        if (!child) {
+            return res.status(404).json({ message: 'Kind account is niet gevonden.' });
+        }
+
+        // Update velden alleen als ze aanwezig zijn in de request body
+        if (name) child.name = name;
+        if (profilePicture) child.profilePicture = profilePicture;
+        if (avatar) child.avatar = avatar;
+
+        const updatedChild = await child.save();
+        res.json(updatedChild);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.updateChildProfile = updateChildProfile;
+
+
 const updateChildAvatar = async (req, res) => {
     const { id } = req.params; // Child ID
     const { avatar } = req.body; // New avatar URL
@@ -411,6 +436,7 @@ module.exports.updatePoints = updatePoints;
 module.exports.addPoints = addPoints;
 module.exports.moveChildToLookBy = moveChildToLookBy;
 module.exports.moveChildToAdjust = moveChildToAdjust;
+
 
 
 
