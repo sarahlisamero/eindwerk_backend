@@ -96,7 +96,11 @@ const taskSchema = new Schema({
     },
     audio: {
         type: String,
-    }
+    },
+    order: { 
+        type: Number, 
+        required: true 
+    } //nieuw voor volgorde taken aanpassen
 });
 
 const Task = mongoose.model('Task', taskSchema);
