@@ -24,5 +24,8 @@ router.delete('/name/:name/child/:childId', authorizeAdmin, tasksController.dele
 
 //patch
 router.patch('/children/:childId/hours', authorizeAdmin, tasksController.patchChildTasksHours);
+//complete task
+router.patch('/complete/:childId/:taskId', authorizeAdmin, tasksController.updateTaskCompleteStatus);
+
 
 module.exports = router;

@@ -205,6 +205,27 @@ const patchChildTasksHours = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
+//update complete status of task
+const updateTaskCompleteStatus = async (req, res) => {
+    const { taskId, childId } = req.params;
+    const { completed } = req.body;
+
+    try {
+        const task = await Task.findOne({ _id: taskId, child: childId });
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found for this child' });
+        }
+
+        task.completed = completed;
+        await task.save();
+
+        res.json(task);
+    } catch (error) {
+        console.error('Error updating task:', error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
 
 module.exports.createTask = createTask;
 module.exports.getTaskById = getTaskById;
@@ -214,3 +235,4 @@ module.exports.getTaskAudio = getTaskAudio;
 module.exports.deleteTask = deleteTask;
 module.exports.deleteTaskByNameAndChildId = deleteTaskByNameAndChildId;
 module.exports.patchChildTasksHours = patchChildTasksHours;
+module.exports.updateTaskCompleteStatus = updateTaskCompleteStatus;
