@@ -32,7 +32,7 @@ const childSchema = new Schema({
     }],
     profilePicture: {
         type: String,
-        default: 'https://albanyvet.com.au/wp-content/uploads/2019/11/blank-profile-picture-973460_640.png',
+        default: 'https://sarahlisamero.be/img/default.png',
     },
     document: [{
         url: {
