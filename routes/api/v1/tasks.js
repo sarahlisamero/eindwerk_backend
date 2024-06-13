@@ -27,5 +27,4 @@ router.patch('/children/:childId/hours', authorizeAdmin, tasksController.patchCh
 //complete task
 router.patch('/complete/:childId/:taskId', authorizeAdmin, tasksController.updateTaskCompleteStatus);
 
-
 module.exports = router;

@@ -14,6 +14,18 @@ const taskSchema = new Schema({
         type: Boolean,
         required: false,
     },
+    completedMorning: {
+        type: Boolean,
+        required: false,
+    },
+    completedNoon: {
+        type: Boolean,
+        required: false,
+    },
+    completedEvening: {
+        type: Boolean,
+        required: false,
+    },
     date: {
         type: Date,
         required: false,
