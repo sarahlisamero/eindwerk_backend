@@ -44,40 +44,48 @@ const getChildById = async (req, res) => {
 // };
 
 exports.uploadChildProfilePicture = async (req, res) => {
-    const userId = req.params.id; // Extract user ID from route parameters
-    if (!userId)
-        return res.status(401).json({ success: false, message: 'User ID not provided!' });
+    const childId = req.params.id; // Haal de childId op uit de route parameters
+    console.log("childID", childId);
+
+    if (!childId) {
+        return res.status(401).json({ success: false, message: 'Child ID not provided!' });
+    }
 
     try {
-        // Check if the user exists
-        const existingUser = await Child.findById(userId);
-        if (!existingUser) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+        // Controleer of het kind bestaat
+        const existingChild = await Child.findById(childId);
+        if (!existingChild) {
+            return res.status(404).json({ success: false, message: 'Child not found' });
         }
 
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Upload file to Cloudinary
+        // Upload de afbeelding naar Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
-            public_id: `${userId}_profilePicture`, // Adjust public_id as needed
+            //public_id: `${childId}_profilePicture`, // Pas public_id aan indien nodig
             width: 500,
             height: 500,
             crop: 'fill',
         });
 
-        // Update user's profile picture URL in the database
-        existingUser.profilePicture = result.secure_url;
-        const updatedUser = await existingUser.save();
+        // Log de Cloudinary URL en het resultaat
+        console.log('Cloudinary URL:', result.secure_url);
+        console.log('Cloudinary Result:', result);
 
-        // Return success response with updated user object
-        res.status(201).json({ success: true, message: 'Your profile has been updated!', user: updatedUser });
+        // Werk de profielfoto-URL van het kind bij in de database
+        existingChild.profilePicture = result.secure_url;
+        const updatedChild = await existingChild.save();
+
+        // Stuur een succesvolle respons met het bijgewerkte kind object
+        res.status(201).json({ success: true, message: 'Profile picture updated successfully', updatedChild });
     } catch (error) {
-        console.error('Error while uploading parent profile image:', error);
-        res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+        console.error('Error updating profile picture URL:', error);
+        res.status(500).json({ success: false, message: 'Failed to update profile picture URL', error: error.message });
     }
 };
+
 
 exports.uploadChildDocument = async (req, res) => {
     const childId = req.params.id;

@@ -12,7 +12,7 @@ router.get('/:id', authorizeAdmin, childrenController.getChildById);
 //post
 router.post('/', authorizeAdmin, childrenController.createChild);
 router.post('/:parentId/credentials', authorizeAdmin, childrenController.checkChildCredentials);
-router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
+//router.post('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
 //router.post('/:id/document', authorizeAdmin, upload.single('document'), childrenController.uploadChildDocument);
 
 router.get('/:id/document', authorizeAdmin, childrenController.getChildDocuments);
@@ -22,6 +22,8 @@ router.post('/:id/document', authorizeAdmin, upload.single('document'), children
 //delete
 router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
 //put
+// Gebruik alleen de PUT-route voor profielfoto-updates
+router.put('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
 
 router.put('/:id', authorizeAdmin, childrenController.updateChildProfile);
 
