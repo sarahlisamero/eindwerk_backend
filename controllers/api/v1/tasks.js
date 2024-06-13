@@ -25,6 +25,9 @@ const createTask = async (req, res) => {
             name: req.body.name,
             duration: req.body.duration,
             completed: req.body.completed,
+            completedMorning: req.body.completedMorning,
+            completedNoon: req.body.completedNoon,
+            completedEvening: req.body.completedEvening,
             date: req.body.date,
             morningSelect: req.body.morningSelect,
             noonSelect: req.body.noonSelect,
@@ -307,7 +310,7 @@ const patchChildTasksHours = async (req, res) => {
 //update complete status of task
 const updateTaskCompleteStatus = async (req, res) => {
     const { taskId, childId } = req.params;
-    const { completed } = req.body;
+    const { completedMorning, completedNoon, completedEvening } = req.body;
 
     try {
         const task = await Task.findOne({ _id: taskId, child: childId });
@@ -316,7 +319,17 @@ const updateTaskCompleteStatus = async (req, res) => {
             return res.status(404).json({ message: 'Task not found for this child' });
         }
 
-        task.completed = completed;
+        // Update the completion status based on the provided values
+        if (completedMorning !== undefined) {
+            task.completedMorning = completedMorning;
+        }
+        if (completedNoon !== undefined) {
+            task.completedNoon = completedNoon;
+        }
+        if (completedEvening !== undefined) {
+            task.completedEvening = completedEvening;
+        }
+
         await task.save();
 
         res.json(task);
