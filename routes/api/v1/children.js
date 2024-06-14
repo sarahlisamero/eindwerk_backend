@@ -21,6 +21,7 @@ router.post('/:id/document', authorizeAdmin, upload.single('document'), children
 
 //delete
 router.delete('/:id', authorizeAdmin, childrenController.deleteChild);
+router.delete('/:childId/document/:documentId', authorizeAdmin, childrenController.deleteChildDocument);
 //put
 // Gebruik alleen de PUT-route voor profielfoto-updates
 router.put('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), childrenController.uploadChildProfilePicture);
@@ -35,3 +36,5 @@ router.put('/:childId/moveToLookBy/:parentId', authorizeAdmin, childrenControlle
 router.put('/:childId/moveToAdjust/:parentId', authorizeAdmin, childrenController.moveChildToAdjust);
 
 module.exports = router;
+
+
