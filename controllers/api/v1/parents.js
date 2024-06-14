@@ -233,22 +233,37 @@ const createParent = async (req, res) => {
 
 const deleteParent = async (req, res) => {
     try {
-        const parent = await Parent.findById(req.params.id);
+        const parentId = req.params.id;
+
+        // Zoek de ouder in de database
+        const parent = await Parent.findById(parentId);
         if (!parent) {
             return res.status(404).json({ message: 'Parent not found' });
         }
-        const children = await Child.find({ parents: parent._id });
 
-        await Child.deleteMany({ parents: parent._id });
+        // Haal alle kinderen op die gekoppeld zijn aan deze ouder
+        const children = await Child.find({ $or: [{ managedBy: parentId }, { adjustBy: parentId }] });
 
-        await Task.deleteMany({ _id: { $in: children.map(child => child.tasks).flat() } });
+        // Loop door elk kind en verwijder of update het kind op basis van de ouderrol
+        for (const child of children) {
+            if (child.managedBy.toString() === parentId) {
+                // Als de ouder de beheerder van het kind is, verwijder het kind
+                await Child.findByIdAndDelete(child._id);
+            } else {
+                // Anders verwijder alleen de verwijzing naar de ouder uit `adjustBy`
+                child.adjustBy = child.adjustBy.filter(p => p.toString() !== parentId);
+                await child.save();
+            }
+        }
 
-        await Parent.findByIdAndDelete(req.params.id);
+        // Verwijder de ouder uit de database
+        await Parent.findByIdAndDelete(parentId);
         res.json({ message: 'Account is succesvol verwijderd.' });
     } catch (error) {
+        console.error('Error deleting parent account:', error);
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 const updateParentUsername = async (req, res) => {
     const { id } = req.params; // Parent ID
