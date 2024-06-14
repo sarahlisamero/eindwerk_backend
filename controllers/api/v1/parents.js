@@ -296,6 +296,92 @@ const updateParentPassword = async (req, res) => {
     }
 };
 
+/*const updateParentProfilePicture = async (req, res) => {
+    const parentId = req.params.id; // Get the parent ID from the route parameters
+    console.log("parentID", parentId);
+
+    if (!parentId) {
+        return res.status(401).json({ success: false, message: 'Parent ID not provided!' });
+    }
+
+    try {
+        // Check if the parent exists
+        const existingParent = await Parent.findById(parentId);
+        if (!existingParent) {
+            return res.status(404).json({ success: false, message: 'Parent not found' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload the image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            width: 500,
+            height: 500,
+            crop: 'fill',
+        });
+
+        // Log the Cloudinary URL and result
+        console.log('Cloudinary URL:', result.secure_url);
+        console.log('Cloudinary Result:', result);
+
+        // Update the parent's profile picture URL in the database
+        existingParent.profilePicture = result.secure_url;
+        const updatedParent = await existingParent.save();
+
+        // Send a successful response with the updated parent object
+        res.status(201).json({ success: true, message: 'Profile picture updated successfully', updatedParent });
+    } catch (error) {
+        console.error('Error updating profile picture URL:', error);
+        res.status(500).json({ success: false, message: 'Failed to update profile picture URL', error: error.message });
+    }
+};*/
+const updateParentProfilePicture = async (req, res) => {
+    const id = req.params.id; // Haal de childId op uit de route parameters
+    console.log("parent", id);
+    //const { profilePicture } = req.body;
+
+    if (!id) {
+        return res.status(401).json({ success: false, message: 'Parent ID not provided!' });
+    }
+
+    try {
+        // Controleer of het kind bestaat
+        const existingParent = await Parent.findById(id);
+        if (!existingParent) {
+            return res.status(404).json({ success: false, message: 'Parent not found' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload de afbeelding naar Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            //public_id: `${childId}_profilePicture`, // Pas public_id aan indien nodig
+            width: 500,
+            height: 500,
+            crop: 'fill',
+        });
+
+        // Log de Cloudinary URL en het resultaat
+        console.log('Cloudinary URL:', result.secure_url);
+        console.log('Cloudinary Result:', result);
+
+        // Werk de profielfoto-URL van het kind bij in de database
+        existingParent.profilePicture = result.secure_url;
+        const updatedParent = await existingParent.save();
+
+        // Stuur een succesvolle respons met het bijgewerkte kind object
+        res.status(201).json({ success: true, message: 'Profile picture updated successfully', updatedParent });
+    } catch (error) {
+        console.error('Error updating profile picture URL:', error);
+        res.status(500).json({ success: false, message: 'Failed to update profile picture URL', error: error.message });
+    }
+};
+
+
 module.exports.getAllParents = getAllParents;
 module.exports.getParentById = getParentById;
 module.exports.createParent = createParent;
@@ -305,3 +391,4 @@ module.exports.signup = signup;
 module.exports.login = login;
 module.exports.uploadProfilePictureDuringSignup = uploadProfilePictureDuringSignup;
 module.exports.updateParentPassword = updateParentPassword;
+module.exports.updateParentProfilePicture = updateParentProfilePicture;

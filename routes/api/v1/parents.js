@@ -26,6 +26,8 @@ router.delete('/:id', authorizeAdmin, parentsController.deleteParent);
 // Update parent username
 router.put('/:id/username', authorizeAdmin, parentsController.updateParentUsername);
 router.put('/:id/password', authorizeAdmin, parentsController.updateParentPassword);
+// Update parent profile picture
+router.put('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), parentsController.updateParentProfilePicture); 
 
 module.exports = router;
 
