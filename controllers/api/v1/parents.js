@@ -129,6 +129,7 @@ const getParentById = async (req, res) => {
     }
 }
 
+// deze heb ik gebruikt om de foto te updaten
 exports.uploadParentProfilePicture = async (req, res) => {
     // Extract user ID from route parameters
     const userId = req.params.id; 
