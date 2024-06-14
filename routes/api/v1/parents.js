@@ -21,6 +21,8 @@ router.post('/verify-password', parentsController.verifyPassword);
 // Upload profile picture during signup
 router.post('/signup/profilePicture', upload.single('profilePicture'), parentsController.uploadProfilePictureDuringSignup);
 
+router.put('/:id/profilePicture', authorizeAdmin, upload.single('profilePicture'), parentsController.uploadParentProfilePicture);
+
 // Delete parent
 router.delete('/:id', authorizeAdmin, parentsController.deleteParent);
 // Update parent username
