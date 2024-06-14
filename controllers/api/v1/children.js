@@ -95,34 +95,74 @@ exports.uploadChildDocument = async (req, res) => {
     }
 
     try {
-        // Retrieve childId from the request parameters and validate it
+        // Zoek het bestaande kind op basis van childId
         const existingChild = await Child.findById(childId);
         if (!existingChild) {
             return res.status(404).json({ success: false, message: 'Child not found' });
         }
 
-        // Check if a file is uploaded
+        // Controleer of er een bestand is geüpload
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Upload the file to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path);
-
-        // Save document details to the existing child
-        existingChild.document.push({
-            url: result.secure_url,
-            public_id: result.public_id
+        // Upload het bestand naar Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            use_filename: true, // Gebruik de bestandsnaam zoals gespecificeerd door Cloudinary
+            unique_filename: false // Schakel unieke bestandsnamen uit (optioneel)
         });
 
-        // Save the updated child
+        // Construct het document object om op te slaan in de database
+        const documentToAdd = {
+            name: req.file.originalname, // Gebruik de originele bestandsnaam
+            url: result.secure_url,
+            public_id: result.public_id
+        };
+
+        // Voeg het document object toe aan de document array van het bestaande kind
+        existingChild.document.push(documentToAdd);
+
+        // Sla het bijgewerkte kind op in de database
         const updatedChild = await existingChild.save();
 
-        // Respond with success message and updated child details
+        // Geef een succesbericht en de bijgewerkte details van het kind terug
         res.status(201).json({ success: true, message: 'Document uploaded successfully', child: updatedChild });
     } catch (error) {
         console.error('Error while uploading child document:', error);
         res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+    }
+};
+
+exports.deleteChildDocument = async (req, res) => {
+    const { childId, documentId } = req.params;
+
+    try {
+        // Zoek het kind op basis van childId
+        const child = await Child.findById(childId);
+        if (!child) {
+            return res.status(404).json({ success: false, message: 'Kind niet gevonden' });
+        }
+
+        // Zoek het document in de array van documenten van het kind
+        const document = child.document.find(doc => doc._id == documentId);
+        if (!document) {
+            return res.status(404).json({ success: false, message: 'Document niet gevonden' });
+        }
+
+        // Verwijder het document uit Cloudinary
+        const result = await cloudinary.uploader.destroy(document.public_id);
+
+        if (result.result === 'ok') {
+            // Verwijder het document uit de array van documenten van het kind
+            child.document = child.document.filter(doc => doc._id != documentId);
+            await child.save();
+            return res.status(200).json({ success: true, message: 'Document succesvol verwijderd' });
+        } else {
+            return res.status(500).json({ success: false, message: 'Er is een probleem opgetreden bij het verwijderen van het document' });
+        }
+    } catch (error) {
+        console.error('Fout bij het verwijderen van het document:', error);
+        res.status(500).json({ success: false, message: 'Interne serverfout bij het verwijderen van het document', error: error.message });
     }
 };
 
@@ -677,3 +717,4 @@ module.exports.moveChildToAdjust = moveChildToAdjust;
 // module.exports.deleteChild = deleteChild;
 // module.exports.updateChildUsername = updateChildUsername;
 // module.exports.checkChildCredentials = checkChildCredentials;
+

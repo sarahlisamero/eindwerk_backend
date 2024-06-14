@@ -35,6 +35,10 @@ const childSchema = new Schema({
         default: 'https://sarahlisamero.be/img/default.png',
     },
     document: [{
+        name: {
+            type: String,
+            required: false
+        },
         url: {
             type: String,
             required: true
