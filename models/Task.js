@@ -112,7 +112,7 @@ const taskSchema = new Schema({
     order: { 
         type: Number, 
         required: true 
-    } //nieuw voor volgorde taken aanpassen
+    }
 });
 
 const Task = mongoose.model('Task', taskSchema);

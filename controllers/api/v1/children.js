@@ -1,20 +1,19 @@
 const Child = require('../../../models/Child');
 const Parent = require('../../../models/Parent');
 const Task = require('../../../models/Task');
-//const uploadController = require('./upload');
 const cloudinary = require('./upload');
 const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, 'uploadsChild'); // Directory where uploaded files will be stored
+      cb(null, 'uploadsChild');
     },
     filename: function (req, file, cb) {
-      cb(null, file.originalname); // Use the original file name for the uploaded file
+      cb(null, file.originalname); 
     }
   });
   
-  const upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 
 const getAllChildren = async (req, res) => {
     try {
@@ -39,20 +38,14 @@ const getChildById = async (req, res) => {
     }
 }
 
-// exports.uploadChildProfilePicture = async (req, res) => {
-//     await uploadController.handleFileUpload(Child, req, res);
-// };
-
 exports.uploadChildProfilePicture = async (req, res) => {
-    const childId = req.params.id; // Haal de childId op uit de route parameters
-    console.log("childID", childId);
+    const childId = req.params.id;
 
     if (!childId) {
         return res.status(401).json({ success: false, message: 'Child ID not provided!' });
     }
 
     try {
-        // Controleer of het kind bestaat
         const existingChild = await Child.findById(childId);
         if (!existingChild) {
             return res.status(404).json({ success: false, message: 'Child not found' });
@@ -62,23 +55,15 @@ exports.uploadChildProfilePicture = async (req, res) => {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Upload de afbeelding naar Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
-            //public_id: `${childId}_profilePicture`, // Pas public_id aan indien nodig
             width: 500,
             height: 500,
             crop: 'fill',
         });
 
-        // Log de Cloudinary URL en het resultaat
-        console.log('Cloudinary URL:', result.secure_url);
-        console.log('Cloudinary Result:', result);
-
-        // Werk de profielfoto-URL van het kind bij in de database
         existingChild.profilePicture = result.secure_url;
         const updatedChild = await existingChild.save();
 
-        // Stuur een succesvolle respons met het bijgewerkte kind object
         res.status(201).json({ success: true, message: 'Profile picture updated successfully', updatedChild });
     } catch (error) {
         console.error('Error updating profile picture URL:', error);
@@ -95,37 +80,30 @@ exports.uploadChildDocument = async (req, res) => {
     }
 
     try {
-        // Zoek het bestaande kind op basis van childId
         const existingChild = await Child.findById(childId);
         if (!existingChild) {
             return res.status(404).json({ success: false, message: 'Child not found' });
         }
 
-        // Controleer of er een bestand is geüpload
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Upload het bestand naar Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
-            use_filename: true, // Gebruik de bestandsnaam zoals gespecificeerd door Cloudinary
-            unique_filename: false // Schakel unieke bestandsnamen uit (optioneel)
+            use_filename: true, 
+            unique_filename: false 
         });
 
-        // Construct het document object om op te slaan in de database
         const documentToAdd = {
-            name: req.file.originalname, // Gebruik de originele bestandsnaam
+            name: req.file.originalname,
             url: result.secure_url,
             public_id: result.public_id
         };
 
-        // Voeg het document object toe aan de document array van het bestaande kind
         existingChild.document.push(documentToAdd);
 
-        // Sla het bijgewerkte kind op in de database
         const updatedChild = await existingChild.save();
 
-        // Geef een succesbericht en de bijgewerkte details van het kind terug
         res.status(201).json({ success: true, message: 'Document uploaded successfully', child: updatedChild });
     } catch (error) {
         console.error('Error while uploading child document:', error);
@@ -137,23 +115,19 @@ exports.deleteChildDocument = async (req, res) => {
     const { childId, documentId } = req.params;
 
     try {
-        // Zoek het kind op basis van childId
         const child = await Child.findById(childId);
         if (!child) {
             return res.status(404).json({ success: false, message: 'Kind niet gevonden' });
         }
 
-        // Zoek het document in de array van documenten van het kind
         const document = child.document.find(doc => doc._id == documentId);
         if (!document) {
             return res.status(404).json({ success: false, message: 'Document niet gevonden' });
         }
 
-        // Verwijder het document uit Cloudinary
         const result = await cloudinary.uploader.destroy(document.public_id);
 
         if (result.result === 'ok') {
-            // Verwijder het document uit de array van documenten van het kind
             child.document = child.document.filter(doc => doc._id != documentId);
             await child.save();
             return res.status(200).json({ success: true, message: 'Document succesvol verwijderd' });
@@ -165,7 +139,6 @@ exports.deleteChildDocument = async (req, res) => {
         res.status(500).json({ success: false, message: 'Interne serverfout bij het verwijderen van het document', error: error.message });
     }
 };
-
 
 exports.getChildDocuments = async (req, res) => {
     try {
@@ -182,45 +155,39 @@ exports.getChildDocuments = async (req, res) => {
     }
 };
 
-
-
-
-
 // Create a new child
 const createChild = async (req, res) => {
     if (req.user.admin) {
-        const { name, parents: parentIds, profilePicture, avatar, points, managedBy } = req.body; // Include profilePicture in the request body
+        const { name, parents: parentIds, profilePicture, avatar, points, managedBy } = req.body;
+
         if (!name) {
             return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
         }
         try {
-            // Check if the child already exists
             const existingChild = await Child.findOne({ name: name });
             if (existingChild) {
                 return res.status(400).json({ message: 'Gebruikersnaam van kind bestaat al.' });
             }
-            // Generate a unique code for the child
             const code = await generateCode();
-            // Find parents 
             const parents = await Parent.find({ _id: { $in: parentIds } });
-            // Create child object
             const child = new Child({
                 name,
                 code,
                 parents: parents.map(parent => parent._id),
-                profilePicture: profilePicture, // Store the Cloudinary URL in the database
+                profilePicture: profilePicture,
                 avatar: avatar,
                 points: points,
                 managedBy: managedBy,
             });
-            // Save child
+
             const newChild = await child.save();
-            // Update parents with new child
+
             parents.forEach(async parent => {
                 parent.children.push(newChild._id);
                 parent.managedChildren.push(newChild._id);
                 await parent.save();
             });
+
             res.status(201).json(newChild);
         } catch(error) {
             res.status(400).json({ message: error.message });
@@ -229,7 +196,6 @@ const createChild = async (req, res) => {
         res.status(403).json({ message: 'Je hebt niet de juiste rechten voor deze actie.' });
     }
 };
-
 
 // generateCode function
 function generateCode(){
@@ -244,28 +210,26 @@ function generateCode(){
 
 const checkChildCredentials = async (req, res) => {
     const { name, code} = req.body;
-    console.log('Received credentials:', name, code);
     const parentId = req.params.parentId;
+
     if (!name || !code) {
         return res.status(400).json({ message: 'Naam en code zijn verplicht.' });
     }
     try{
-     //find child and check credentials
         const child = await Child.findOne({ name: name, code: code }).populate('parents');
         if (!child) {
             return res.status(404).json({ message: 'Onjuiste gegevens.' });
         } 
-        //find parent
+
         const parent = await Parent.findById(parentId);
         if (!parent) {
             return res.status(404).json({ message: 'Ouder is niet gevonden.' });
         }
-        // Check if child is already linked to the parent
+
         if (parent.children.includes(child._id)) {
             return res.status(400).json({ message: 'Kind en ouder zijn al gelinkt.' });
         }
 
-        //link parent and child
         parent.children.push(child._id);
         parent.adjustChildren.push(child._id);
         await parent.save();
@@ -273,6 +237,7 @@ const checkChildCredentials = async (req, res) => {
         child.adjustBy.push(parent._id);
         child.parents.push(parent._id);
         await child.save();
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -298,8 +263,8 @@ const deleteChild = async (req, res) => {
 };
 
 const updateChildUsername = async (req, res) => {
-    const { id } = req.params; // Child ID
-    const { name } = req.body; // New username
+    const { id } = req.params; 
+    const { name } = req.body; 
 
     try {
         const child = await Child.findById(id);
@@ -320,8 +285,8 @@ const updateChildUsername = async (req, res) => {
 };
 
 const updateChildProfile = async (req, res) => {
-    const { id } = req.params; // Child ID
-    const { name, profilePicture, avatar } = req.body; // Nieuwe gegevens
+    const { id } = req.params; 
+    const { name, profilePicture, avatar } = req.body; 
 
     try {
         const child = await Child.findById(id);
@@ -329,24 +294,21 @@ const updateChildProfile = async (req, res) => {
             return res.status(404).json({ message: 'Kind account is niet gevonden.' });
         }
 
-        // Update velden alleen als ze aanwezig zijn in de request body
         if (name) child.name = name;
         if (profilePicture) child.profilePicture = profilePicture;
         if (avatar) child.avatar = avatar;
 
         const updatedChild = await child.save();
         res.json(updatedChild);
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports.updateChildProfile = updateChildProfile;
-
-
 const updateChildAvatar = async (req, res) => {
-    const { id } = req.params; // Child ID
-    const { avatar } = req.body; // New avatar URL
+    const { id } = req.params; 
+    const { avatar } = req.body; 
 
     try {
         const child = await Child.findById(id);
@@ -381,8 +343,9 @@ const updatePoints = async (req, res) => {
       console.error(err);
       res.status(500).json({ message: 'Internal server error' });
     }
-  };
-  const addPoints = async (req, res) => {
+};
+
+const addPoints = async (req, res) => {
     const { id } = req.params;
     const { points } = req.body;
 
@@ -400,9 +363,9 @@ const updatePoints = async (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
     }
- };
+};
 
- const moveChildToLookBy = async (req, res) => {
+const moveChildToLookBy = async (req, res) => {
     const { childId, parentId } = req.params;
 
     try {
@@ -416,14 +379,12 @@ const updatePoints = async (req, res) => {
             return res.status(404).json({ message: 'Parent not found.' });
         }
 
-        // Remove childId from adjustBy and add to lookBy
         child.adjustBy = child.adjustBy.filter(id => id.toString() !== parentId);
         if (!Array.isArray(child.lookBy)) {
             child.lookBy = [];
         }
         child.lookBy.push(parentId);
 
-        // Remove childId from adjustChildren and add to lookChildren
         parent.adjustChildren = parent.adjustChildren.filter(id => id.toString() !== childId);
         if (!Array.isArray(parent.lookChildren)) {
             parent.lookChildren = [];
@@ -453,14 +414,12 @@ const moveChildToAdjust = async (req, res) => {
             return res.status(404).json({ message: 'Parent not found.' });
         }
 
-        // Remove parentId from lookBy and add to adjustBy
         child.lookBy = child.lookBy.filter(id => id.toString() !== parentId);
         if (!Array.isArray(child.adjustBy)) {
             child.adjustBy = [];
         }
         child.adjustBy.push(parentId);
 
-        // Remove childId from lookChildren and add to adjustChildren
         parent.lookChildren = parent.lookChildren.filter(id => id.toString() !== childId);
         if (!Array.isArray(parent.adjustChildren)) {
             parent.adjustChildren = [];
@@ -487,237 +446,4 @@ module.exports.updatePoints = updatePoints;
 module.exports.addPoints = addPoints;
 module.exports.moveChildToLookBy = moveChildToLookBy;
 module.exports.moveChildToAdjust = moveChildToAdjust;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const Child = require('../../../models/Child');
-// const Parent = require('../../../models/Parent');
-// const Task = require('../../../models/Task');
-// //const uploadController = require('./upload');
-
-// const cloudinary = require('./upload');
-// const multer = require('multer');
-
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//       cb(null, 'uploadsChild'); // Directory where uploaded files will be stored
-//     },
-//     filename: function (req, file, cb) {
-//       cb(null, file.originalname); // Use the original file name for the uploaded file
-//     }
-//   });
-  
-//   const upload = multer({ storage: storage });
-
-// const getAllChildren = async (req, res) => {
-//     try {
-//         const children = await Child.find().populate('parents');
-//         res.json(children);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// }
-
-// const getChildById = async (req, res) => {
-//     try {
-//         const child = await Child.findById(req.params.id).populate('parents');
-//         if(child){
-//             res.json(child);
-//         }
-//         else{
-//             res.status(404).json({ message: 'Kind account is niet gevonden.' });
-//         }
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// }
-
-// // exports.uploadChildProfilePicture = async (req, res) => {
-// //     await uploadController.handleFileUpload(Child, req, res);
-// // };
-
-// exports.uploadChildProfilePicture = async (req, res) => {
-//     const userId = req.params.id; // Extract user ID from route parameters
-//     if (!userId)
-//         return res.status(401).json({ success: false, message: 'User ID not provided!' });
-
-//     try {
-//         // Check if the user exists
-//         const existingUser = await Child.findById(userId);
-//         if (!existingUser) {
-//             return res.status(404).json({ success: false, message: 'User not found' });
-//         }
-
-//         if (!req.file) {
-//             return res.status(400).json({ success: false, message: 'No file uploaded' });
-//         }
-
-//         // Upload file to Cloudinary
-//         const result = await cloudinary.uploader.upload(req.file.path, {
-//             public_id: `${userId}_profilePicture`, // Adjust public_id as needed
-//             width: 500,
-//             height: 500,
-//             crop: 'fill',
-//         });
-
-//         // Update user's profile picture URL in the database
-//         existingUser.profilePicture = result.secure_url;
-//         const updatedUser = await existingUser.save();
-
-//         // Return success response with updated user object
-//         res.status(201).json({ success: true, message: 'Your profile has been updated!', user: updatedUser });
-//     } catch (error) {
-//         console.error('Error while uploading parent profile image:', error);
-//         res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
-//     }
-// };
-
-// exports.uploadChildDocument = async (req, res) => {
-//     await uploadController.handleFileUpload(Child, req, res);
-// };
-
-
-// // createChild function
-// const createChild = async (req, res) => {
-//     if (req.user.admin){
-//         const { name, parents: parentIds } = req.body; 
-//         if (!name) {
-//             return res.status(400).json({ message: 'Gebruikersnaam is verplicht.' });
-//         }
-//         try{
-//             //if child already exists
-//             const existingChild = await Child.findOne({ name: name });
-//             if (existingChild) {
-//                 return res.status(400).json({ message: 'Gebruikersnaam van kind bestaat al.' });
-//             }
-//             // generate a unique code for the child
-//             const code = await generateCode();
-//             // find parents 
-//             const parents = await Parent.find({ _id: { $in: parentIds } });
-//             // create child object
-//             const child = new Child({
-//                 name,
-//                 code,
-//                 parents: parents.map(parent => parent._id),
-//                 profilePicture: profilePicture // Store the Cloudinary URL in the database
-//             });
-//             // save child
-//             const newChild = await child.save();
-//             // update parents with new child
-//             parents.forEach(async parent => {
-//                 parent.children.push(newChild._id);
-//                 await parent.save();
-//             });
-//             res.status(201).json(newChild);
-//         }
-//         catch(error){
-//             res.status(400).json({ message: error.message });
-//         }
-//     }else {
-//         res.status(403).json({ message: 'Je hebt niet de juiste rechten voor deze actie.' });
-//     }
-// };
-
-// // generateCode function
-// function generateCode(){
-//     const randomString = Math.random().toString(36).substring(2, 8);
-//     return Child.exists({ code: randomString }).then(exists => {
-//         if(exists){
-//             return generateCode();
-//         }
-//         return randomString;
-//     });
-// }
-
-// const checkChildCredentials = async (req, res) => {
-//     const { name, code} = req.body;
-//     console.log('Received credentials:', name, code);
-//     const parentId = req.params.parentId;
-//     if (!name || !code) {
-//         return res.status(400).json({ message: 'Naam en code zijn verplicht.' });
-//     }
-//     try{
-//      //find child and check credentials
-//         const child = await Child.findOne({ name: name, code: code }).populate('parents');
-//         if (!child) {
-//             return res.status(404).json({ message: 'Onjuiste gegevens.' });
-//         } 
-//         //find parent
-//         const parent = await Parent.findById(parentId);
-//         if (!parent) {
-//             return res.status(404).json({ message: 'Ouder is niet gevonden.' });
-//         }
-//         // Check if child is already linked to the parent
-//         if (parent.children.includes(child._id)) {
-//             return res.status(400).json({ message: 'Kind en ouder zijn al gelinkt.' });
-//         }
-//         //link parent and child
-//         parent.children.push(child._id);
-//         await parent.save();
-//         child.parents.push(parent._id);
-//         await child.save();
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
-// const deleteChild = async (req, res) => {
-//     try {
-//         const childId = req.params.id;
-//         const child = await Child.findById(childId);
-//         if(!child){
-//             return res.status(404).json({ message: 'Kind account is niet gevonden.' });
-//         }
-//         await Parent.updateMany(
-//             { _id: { $in: child.parents } }, 
-//             { $pull: { children: childId } 
-//         });
-//         await Child.findByIdAndDelete(childId);
-//         res.json({ message: 'Kind account is succesvol verwijderd.' });
-//     }
-//     catch(error){
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
-// const updateChildUsername = async (req, res) => {
-//     const { id } = req.params; // Child ID
-//     const { name } = req.body; // New username
-
-//     try {
-//         const child = await Child.findById(id);
-//         if (!child) {
-//             return res.status(404).json({ message: 'Kind account is niet gevonden.' });
-//         }
-
-//         child.name = name;
-//         const updatedChild = await child.save();
-
-//         res.json(updatedChild);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
-// module.exports.getAllChildren = getAllChildren;
-// module.exports.getChildById = getChildById;
-// module.exports.createChild = createChild;
-// module.exports.deleteChild = deleteChild;
-// module.exports.updateChildUsername = updateChildUsername;
-// module.exports.checkChildCredentials = checkChildCredentials;
-
+module.exports.updateChildProfile = updateChildProfile;

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const tasksController = require('../../../controllers/api/v1/tasks');
 const upload = require('../../../middlewares/upload');
-const authorizeAdmin = require('../../../middlewares/auth'); // Import verifyToken middleware
+const authorizeAdmin = require('../../../middlewares/auth');
 
 //post
 router.post('/', authorizeAdmin, tasksController.createTask);
@@ -24,7 +24,6 @@ router.delete('/name/:name/child/:childId', authorizeAdmin, tasksController.dele
 
 //patch
 router.patch('/children/:childId/hours', authorizeAdmin, tasksController.patchChildTasksHours);
-//complete task
 router.patch('/complete/:childId/:taskId', authorizeAdmin, tasksController.updateTaskCompleteStatus);
 
 module.exports = router;

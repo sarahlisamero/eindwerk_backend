@@ -12,7 +12,6 @@ app.use(express.json());
 app.use(cors());
 
 mongoose.connect(process.env.MONGODB);
-//console.log(process.env.MONGODB);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -23,9 +22,9 @@ db.once("open", function () {
 const parentsRouter = require('./routes/api/v1/parents');
 app.use('/api/v1/parents', parentsRouter);
 const childrenRouter = require('./routes/api/v1/children');
-app.use('/api/v1/children', /*passport.authenticate('jwt', {session: false}),*/ childrenRouter);
+app.use('/api/v1/children', childrenRouter);
 const tasksRouter = require('./routes/api/v1/tasks');
-app.use('/api/v1/tasks', /*passport.authenticate('jwt', {session: false}),*/ tasksRouter);
+app.use('/api/v1/tasks', tasksRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
