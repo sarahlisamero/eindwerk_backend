@@ -202,7 +202,7 @@ const verifyPassword = async (req, res) => {
 
         const passwordMatch = await bcrypt.compare(password, parent.password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid password' });
+            return res.status(401).json({ message: 'Wachtwoord is onjuist.' });
         }
 
         // Password is correct, send success response
@@ -270,6 +270,10 @@ const updateParentUsername = async (req, res) => {
     const { id } = req.params; // Parent ID
     const { username } = req.body; // New username
 
+    if (!username) {
+        return res.status(400).json({ message: 'veld is verplicht' });
+    }
+
     try {
         const parent = await Parent.findById(id);
         if (!parent) {
@@ -298,7 +302,7 @@ const updateParentPassword = async (req, res) => {
         // Verify current password
         const isPasswordValid = await bcrypt.compare(currentPassword, parent.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid current password' });
+            return res.status(401).json({ message: 'wachtwoord is incorrect' });
         }
 
         // Hash and update new password

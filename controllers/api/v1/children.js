@@ -306,6 +306,9 @@ const updateChildUsername = async (req, res) => {
         if (!child) {
             return res.status(404).json({ message: 'Kind account is niet gevonden.' });
         }
+        if (child.name === name) {
+            return res.status(400).json({ message: 'naam is hetzelfde als huidige naam' });
+        }
 
         child.name = name;
         const updatedChild = await child.save();
