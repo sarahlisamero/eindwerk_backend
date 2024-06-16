@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const passportLocalMongoose = require('passport-local-mongoose');
 
 const Parent = new Schema({
     username: {
@@ -36,7 +35,5 @@ const Parent = new Schema({
         default: 'https://sarahlisamero.be/img/default.png',
     },
 });
-
-Parent.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model ('Parent', Parent)
