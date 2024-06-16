@@ -54,32 +54,6 @@ const signup = async (req, res) => {
     }
 };
 
-
-// const signup = async (req, res) => {
-//     const { username, password, admin } = req.body;
-//     // Check if username or password is empty
-//     if (!username || !password) {
-//         return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht.' });
-//     }
-//     try {
-//         const existingParent = await Parent.findOne({ username });
-//         if (existingParent) {
-//             return res.status(400).json({ message: 'Gebruiker bestaat al.' });
-//         }
-
-//         const hashedPassword = await bcrypt.hash(password, 10); 
-
-//         const parent = new Parent({ username, password: hashedPassword, admin });
-//         const newParent = await parent.save();
-
-//         const token = generateToken(newParent._id, newParent.admin);
-
-//         res.status(201).json({ newParent, token });;
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
 const login = async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -129,43 +103,64 @@ const getParentById = async (req, res) => {
     }
 }
 
-// deze heb ik gebruikt om de foto te updaten
 exports.uploadParentProfilePicture = async (req, res) => {
-    // Extract user ID from route parameters
-    const userId = req.params.id; 
-    if (!userId)
-        return res.status(401).json({ success: false, message: 'User ID not provided!' });
-
     try {
-        // Check if the user exists
-        const existingUser = await Parent.findById(userId);
-        if (!existingUser) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+        const { profilePicture } = req.body;
+        const parent = await Parent.findByIdAndUpdate(req.params.id, { profilePicture }, { new: true });
+
+        if (!parent) {
+            return res.status(404).json({ error: 'Parent not found' });
         }
 
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No file uploaded' });
-        }
-
-        // Upload file to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            public_id: `${userId}_profilePicture`, // Adjust public_id as needed
-            width: 500,
-            height: 500,
-            crop: 'fill',
-        });
-
-        // Update user's profile picture URL in the database
-        existingUser.profilePicture = result.secure_url;
-        const updatedUser = await existingUser.save();
-
-        // Return success response with updated user object
-        res.status(201).json({ success: true, message: 'Your profile has been updated!', user: updatedUser });
+        res.json({ message: 'Parent profile picture updated successfully', parent });
     } catch (error) {
-        console.error('Error while uploading parent profile image:', error);
-        res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+        console.error('Error updating parent profile picture:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+// exports.uploadParentProfilePicture = async (req, res) => {
+//     await uploadController.handleFileUpload(Parent, req, res);
+// };
+
+// // deze heb ik gebruikt om de foto te updaten
+// exports.uploadParentProfilePicture = async (req, res) => {
+//     // Extract user ID from route parameters
+//     const userId = req.params.id; 
+//     if (!userId)
+//         return res.status(401).json({ success: false, message: 'User ID not provided!' });
+
+//     try {
+//         // Check if the user exists
+//         const existingUser = await Parent.findById(userId);
+//         if (!existingUser) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+
+//         if (!req.file) {
+//             return res.status(400).json({ success: false, message: 'No file uploaded' });
+//         }
+
+//         // Upload file to Cloudinary
+//         const result = await cloudinary.uploader.upload(req.file.path, {
+//             public_id: `${userId}_profilePicture`, // Adjust public_id as needed
+//             width: 500,
+//             height: 500,
+//             crop: 'fill',
+//         });
+
+//         // Update user's profile picture URL in the database
+//         existingUser.profilePicture = result.secure_url;
+//         const updatedUser = await existingUser.save();
+
+//         // Return success response with updated user object
+//         res.status(201).json({ success: true, message: 'Your profile has been updated!', user: updatedUser });
+//     } catch (error) {
+//         console.error('Error while uploading parent profile image:', error);
+//         res.status(500).json({ success: false, message: 'Server error, please try again later', error: error.message });
+//     }
+// };
 
 const uploadProfilePictureDuringSignup = async (req, res) => {
     try {
